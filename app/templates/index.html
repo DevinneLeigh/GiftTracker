@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h1 class="mb-4">Gift Tracker</h1>
+
+    <!-- Add Person + Add Event Buttons -->
+    <div class="mb-4">
+        <a href="{% url 'add_recipient' %}" class="btn btn-primary me-2">Add Person</a>
+        <a href="{% url 'add_event' %}" class="btn btn-success">Add New Event</a>
+    </div>
+
+    <!-- Events Dropdown -->
+    <div class="card p-3 shadow-sm" style="max-width: 400px;">
+        <label class="form-label fw-bold">Your Events</label>
+
+        {% if events %}
+            <select class="form-select" onchange="if (this.value) window.location.href=this.value;">
+                <option value="">Select an event…</option>
+
+                {% for event in events %}
+                    <option value="{% url 'view_event' event.id %}">
+                        {{ event.event }}
+                    </option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <p class="text-muted">You have no events yet.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+

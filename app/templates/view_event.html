@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>{{ event.event }}</h2>
+
+<h4>Participants</h4>
+
+{% if participants %}
+    <ul>
+        {% for p in participants %}
+            <li>{{ p.recipient.name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No participants yet.</p>
+{% endif %}
+
+{% endblock %}
