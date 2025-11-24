@@ -6,31 +6,58 @@
 
     <h1 class="mb-4">Gift Tracker</h1>
 
-    <!-- Add Person + Add Event Buttons -->
-    <div class="mb-4">
-        <a href="{% url 'add_recipient' %}" class="btn btn-primary me-2">Add Person</a>
-        <a href="{% url 'add_event' %}" class="btn btn-success">Add New Event</a>
+    <!-- ======================== -->
+    <!-- RECIPIENTS SECTION -->
+    <!-- ======================== -->
+    <div class="card p-3 shadow-sm mb-4">
+        <h3 class="fw-bold mb-3">People</h3>
+
+        {% if recipients %}
+            <ul class="list-group mb-3">
+                {% for r in recipients %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ r.name }}</span>
+
+                        <div>
+                            <a href="{% url 'edit_recipient' r.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
+                            <a href="{% url 'delete_recipient' r.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">You don’t have any people saved yet.</p>
+        {% endif %}
+
+        <a href="{% url 'add_recipient' %}" class="btn btn-primary">Add Person</a>
     </div>
 
-    <!-- Events Dropdown -->
-    <div class="card p-3 shadow-sm" style="max-width: 400px;">
-        <label class="form-label fw-bold">Your Events</label>
+    <!-- ======================== -->
+    <!-- EVENTS SECTION -->
+    <!-- ======================== -->
+    <div class="card p-3 shadow-sm mb-4">
+        <h3 class="fw-bold mb-3">Events</h3>
 
         {% if events %}
-            <select class="form-select" onchange="if (this.value) window.location.href=this.value;">
-                <option value="">Select an event…</option>
-
+            <ul class="list-group mb-3">
                 {% for event in events %}
-                    <option value="{% url 'view_event' event.id %}">
-                        {{ event.event }}
-                    </option>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ event.event }}</span>
+
+                        <div>
+                            <a href="{% url 'view_event' event.id %}" class="btn btn-info btn-sm me-2">Open</a>
+                            <a href="{% url 'edit_event' event.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
+                            <a href="{% url 'delete_event' event.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </li>
                 {% endfor %}
-            </select>
+            </ul>
         {% else %}
-            <p class="text-muted">You have no events yet.</p>
+            <p class="text-muted">You don’t have any events yet.</p>
         {% endif %}
+
+        <a href="{% url 'add_event' %}" class="btn btn-success">Add New Event</a>
     </div>
 
 </div>
 {% endblock %}
-
