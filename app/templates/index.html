@@ -2,62 +2,161 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
+
 
     <h1 class="mb-4">Gift Tracker</h1>
+    <div class="home_content">
+        <div class="home_left home_panel">
+            <h3 class="fw-bold mb-3">Events</h3>
+            {% if events %}
+                <ul class="list-group event_list">
+                    {% for event in events %}     
+                        <li class="list-group-item event">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">...</button>
+                                <ul class="dropdown-menu">
+                                     <li><a class="dropdown-item" href="{% url 'edit_event' event.id %}">Edit</a></li>
+                                    <li><button class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/event/{{ e.id }}/delete/', 'event')">Delete</button></li>
+                                </ul>
+                            </div>  
+                            <div><h3>{{ event.event }}</h3></div>
+                            {% if participants  %}
+                            <div class="participants">
+                                {% for p in event.participant_set.all %}
+                                        <div class="participant">
+                                            {{ p.recipient.name }}
+                                        </div>
+                                {% endfor %} 
+                            </div> 
+                            {% endif %}  
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openAddModal('Add New Event', `{% url 'add_event' %}`, 'event-form-template', 'Add Event')">Add New Event</button>
+        </div>
 
-    <!-- ======================== -->
-    <!-- RECIPIENTS SECTION -->
-    <!-- ======================== -->
-    <div class="card p-3 shadow-sm mb-4">
-        <h3 class="fw-bold mb-3">People</h3>
+        <div class="home_right home_panel">
+            {% if recipients %}
+                <ul class="list-group mb-3 people_list">
+                    {% for r in recipients %}
+                        <li class="list-group-item people">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">...</button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'edit_recipient' r.id %}">Edit</a></li>
+                                    <li><button class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal"onclick="openDeleteModal('/recipient/{{ r.id }}/delete/', 'recipient')">Delete</button></li>
+                                </ul>
+                            </div>
+                            <div class="name"><h3>{{ r.name }}</h3></div>
+                            {% if r.wishlist.all %}
+                            <div class="d-flex flex-row gap-1 justify-content-center">
+                                <div>
+                                    <a href="{% url 'view_wish_list' r.id %}" class="wish_list_button btn btn-primary">View wish list</a>
+                                </div>
+                                <div>
+                                    <button class="wish_list_button btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openAddModal('Add Item to Wish List', `{% url 'add_wish_list' r.id %}`, 'wishlist-form-template', 'Add Item')">Add items +</button>
+                                </div>
+                            </div>
+                            {% else %}
+                                <div class="d-flex justify-content-center">
+                                    <button class="wish_list_button btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openAddModal('Add Item to Wish List', `{% url 'add_wish_list' r.id %}`, 'wishlist-form-template', 'Add Item')">Create new wish list +</button>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
 
-        {% if recipients %}
-            <ul class="list-group mb-3">
-                {% for r in recipients %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{{ r.name }}</span>
-
-                        <div>
-                            <a href="{% url 'edit_recipient' r.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
-                            <a href="{% url 'delete_recipient' r.id %}" class="btn btn-danger btn-sm">Delete</a>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-muted">You don’t have any people saved yet.</p>
-        {% endif %}
-
-        <a href="{% url 'add_recipient' %}" class="btn btn-primary">Add Person</a>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openAddModal('Add New Recipient', `{% url 'add_recipient' %}`, 'recipient-form-template', 'Add Recipient')">Add Person</button>
+        </div>
     </div>
 
-    <!-- ======================== -->
-    <!-- EVENTS SECTION -->
-    <!-- ======================== -->
-    <div class="card p-3 shadow-sm mb-4">
-        <h3 class="fw-bold mb-3">Events</h3>
 
-        {% if events %}
-            <ul class="list-group mb-3">
-                {% for event in events %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{{ event.event }}</span>
-
-                        <div>
-                            <a href="{% url 'view_event' event.id %}" class="btn btn-info btn-sm me-2">Open</a>
-                            <a href="{% url 'edit_event' event.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
-                            <a href="{% url 'delete_event' event.id %}" class="btn btn-danger btn-sm">Delete</a>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-muted">You don’t have any events yet.</p>
-        {% endif %}
-
-        <a href="{% url 'add_event' %}" class="btn btn-success">Add New Event</a>
+<!-- Add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" id="addModalForm">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="addModalTitle">Add Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="addModalBody">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="addModalSubmitBtn">
+            Submit
+          </button>
+        </div>
+      </form>
     </div>
-
+  </div>
 </div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" id="deleteForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalTitle">Delete Item</h5>
+                </div>
+                <div class="modal-body" id="deleteModalBody">
+                    Are you sure you want to delete this item?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Delete Modal JavaScript -->
+<script>
+function openDeleteModal(actionUrl, label) {
+    const form = document.getElementById("deleteForm");
+    const title = document.getElementById("deleteModalTitle");
+    const body = document.getElementById("deleteModalBody");
+
+    form.action = actionUrl;
+    title.textContent = `Delete ${label}`;
+    body.textContent = `Are you sure you want to delete this ${label}?`;
+}
+</script>
+
+<!-- Add Modal JavaScript -->
+<script>
+function openAddModal(title, actionUrl, templateId, submitText="Submit") {
+    document.getElementById("addModalTitle").textContent = title;
+    document.getElementById("addModalForm").action = actionUrl;
+    document.getElementById("addModalBody").innerHTML =
+        document.getElementById(templateId).innerHTML;
+    document.getElementById("addModalSubmitBtn").textContent = submitText;
+}
+</script>
+
+
+<script type="text/template" id="event-form-template">
+    {{ event_form.as_p }}
+</script>
+
+<script type="text/template" id="recipient-form-template">
+    {{ recipient_form.as_p }}
+</script>
+
+<script type="text/template" id="wishlist-form-template">
+    <label>Item URL</label>
+    <input type="text" class="form-control" name="item_url" required>
+</script>
+
+
+
 {% endblock %}

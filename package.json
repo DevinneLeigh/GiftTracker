@@ -1,5 +1,6 @@
 {
-  "dependencies": {
-    "bootstrap": "^5.3.8"
-  }
+    "scripts": {
+        "serve": "python manage.py runserver 0.0.0.0:8000",
+        "sass": "sass static/scss/main.scss static/css/main.css --style=compressed --watch"
+    }
 }

@@ -1,4 +1,77 @@
-@use "../../node_modules/bootstrap/scss/bootstrap";
 @use 'base';
 @use 'header';
 @use 'footer';
+
+.dropdown-toggle::after {
+    content: unset;
+}
+
+h3 {
+    font-size: 22px;
+    text-align: center;
+}
+
+.home_content{
+    display: flex;
+    flex-flow: row;
+    justify-content: space-around;
+    margin: 20px;
+    .home_panel{
+        padding: 10px;
+        border-radius: 10px;
+    }
+    .home_left {
+        width: 70%;
+    }
+    .home_right{
+        width: 20%;
+        background: #f6f6f6;
+    }
+}
+
+.event_list{
+    display: flex;
+    gap: 15px;
+    .event{
+        border-radius: 10px;
+        border: none;
+        border-radius: 10px;
+        background: #f6f6f6;
+        padding: 5px 20px 30px 20px;
+    }
+}
+
+.participants{
+    display: flex;
+    flex-flow: row;
+    gap: 10px;
+    .participant{
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+}
+.name{
+ text-align: center;
+}
+
+.people_list{
+    display: flex;
+    gap: 15px;
+    .people{
+        border: none;
+        border-radius: 10px;
+        background: #ffffff;
+        padding-bottom: 30px;
+    }
+}
+
+.dropdown {
+    text-align: right;
+    .dropdown-toggle{
+        padding-top: 0;
+        padding-right: 0;
+        border: none;
+    }
+}
