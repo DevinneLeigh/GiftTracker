@@ -3,6 +3,10 @@ Compile scss
 ```bash
 sass static/scss/main.scss static/css/main.css --style=compressed
 ```
+Watch scss
+```bash
+sass --watch static/scss/main.scss static/css/main.css --style=compressed
+```
 
 Run development server
 ```bash

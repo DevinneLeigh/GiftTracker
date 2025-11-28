@@ -1,0 +1,30 @@
+{% comment %} Used for Add/Edit Participant {% endcomment %}
+{% csrf_token %}
+<div class="mb-3">
+    <label for="{{ form.recipient.id_for_label }}" class="form-label">Recipient</label>
+    {{ form.recipient }}
+</div>
+
+<div class="mb-3">
+    <label for="budget" class="form-label">Budget</label>
+    <input type="number" step="10" min="0" name="budget" class="form-control"
+        {% if participant and participant.budget %}
+            value="{{ participant.budget.price }}"
+        {% endif %}
+    >
+</div>
+
+<!-- {% comment %} Used for Add/Edit Participant {% endcomment %}
+{% csrf_token %}
+<div class="mb-3">
+    <label for="{{ form.recipient.id_for_label }}" class="form-label">Recipient</label>
+    {{ form.recipient }}
+</div>
+
+<div class="mb-3">
+    <label for="budget" class="form-label">Budget</label>
+    <input type="number" step="0.01" min="0" name="budget" class="form-control"
+        value="{% if participant and participant.budget %}{{ participant.budget.price }}{% endif %}">
+</div> -->
+
+
