@@ -8,9 +8,18 @@ Watch scss
 sass --watch static/scss/main.scss static/css/main.css --style=compressed
 ```
 
-Run development server
+Set up virtual environment
 ```bash
 source ~/mysite/venv/bin/activate
+```
+
+Install beautiful soup
+```bash
+pip install requests beautifulsoup4
+```
+
+Run development server
+```bash
 python manage.py runserver 0.0.0.0:8000
 ```
 Then go to: 

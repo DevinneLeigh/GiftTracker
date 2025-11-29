@@ -24,6 +24,8 @@
                             </div>  
                             <div><h3>{{ e.event }}</h3></div>                         
                             {% if participants  %}
+                            <a href="{% url 'view_event' e.id %}" class="btn btn-info btn-sm">View Celebration</a>
+
                             <div class="participants">
                                 <button class="add_participant"
                                     data-bs-toggle="modal"

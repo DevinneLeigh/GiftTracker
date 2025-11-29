@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>{{ event.event }}</h2>
+<!-- <h2>{{ event.event }}</h2>
 
 <h4>Participants</h4>
 
@@ -13,6 +13,64 @@
     </ul>
 {% else %}
     <p>No participants yet.</p>
+{% endif %} -->
+
+
+
+
+<h2>{{ event.event }}</h2>
+<hr>
+
+<h4>Participants</h4>
+
+{% if participants %}
+    <ul class="list-group mb-4">
+        {% for p in participants %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>
+                    {{ p.recipient.name }}
+                    {% if p.budget %}
+                        <span class="text-muted">— {{ p.budget.price|floatformat:2 }}</span>
+                    {% endif %}
+                </span>
+
+                <div class="dropdown">
+                    <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        ...
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button class="dropdown-item"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#addModal"
+                                    onclick="openModal('Edit Participant', `{% url 'edit_participant' p.id %}`)">
+                                Edit
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    onclick="openDeleteModal('/participant/{{ p.id }}/delete/', 'participant')">
+                                Delete
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No participants yet.</p>
 {% endif %}
 
+<!-- Add Participant Button -->
+<button class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#addModal"
+        onclick="openModal('Add Participant', `{% url 'add_participant' event.id %}`)">
+    Add Participant +
+</button>
+
 {% endblock %}
+

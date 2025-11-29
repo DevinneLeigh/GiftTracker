@@ -23,6 +23,10 @@ class Participant(models.Model):
 class WishList(models.Model):
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE, related_name="wishlist")
     item_url = models.CharField(max_length=5000, default="")
+    product_name = models.CharField(max_length=255, blank=True, null=True)
+    product_image = models.CharField(max_length=5000, blank=True, null=True)
+    product_price = models.CharField(max_length=50, blank=True, null=True)
+
     def __str__(self):
         return f"Wish: {self.item_url} ({self.recipient.name})"
 
@@ -32,7 +36,11 @@ class Gift(models.Model):
         WishList, on_delete=models.SET_NULL, null=True, blank=True
     )
     item_url = models.CharField(max_length=5000, default="")
+    product_name = models.CharField(max_length=255, blank=True, null=True)
+    product_image = models.CharField(max_length=5000, blank=True, null=True)
+    product_price = models.CharField(max_length=50, blank=True, null=True)
     purchased = models.BooleanField(default=False)
+
     def __str__(self):
         return f"Gift: {self.item_url} ({'Purchased' if self.purchased else 'Not Purchased'})"
 

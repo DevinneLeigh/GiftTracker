@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from .forms import TemplateFormMixin, RecipientForm, EventForm, WishListForm, ParticipantForm
 from .models import Recipient, Event, Participant, Gift, Budget, WishList
-from .utils import get_default_user
+from .utils import get_default_user, scrape_product
 
 def index(request):
     recipients = Recipient.objects.all()
@@ -68,11 +68,11 @@ def delete_event(request, id):
         event.delete()
     return redirect(request.META.get("HTTP_REFERER", "index"))
 
-
-def view_event(request, event_id):
+def view_event(request, id):
     user = get_default_user()
-    event = get_object_or_404(Event, id=event_id, user=user)
-    participants = Participant.objects.filter(event=event)
+    event = get_object_or_404(Event, id=id, user=user)
+    # participants = Participant.objects.filter(event=event)
+    participants = event.participant_set.select_related("recipient").all()
     return render(request, "view_event.html", {
         "event": event,
         "participants": participants,
@@ -184,19 +184,46 @@ def delete_participant(request, id):
 
 
 # Wistlists
+# def add_wish_list(request, recipient_id):
+#     user = get_default_user()
+#     recipient = get_object_or_404(Recipient, id=recipient_id, user=user)
+#     if request.method == "POST":
+#         form = WishListForm(request.POST)
+#         if form.is_valid():
+#             item = form.save(commit=False)
+#             item.recipient = recipient
+#             item.save()
+#             return redirect(request.META.get("HTTP_REFERER", "index"))
+
+#     else:
+#         form = WishListForm()
+#     html = render_to_string("partials/wishlist_form.html", {"form": form}, request=request)
+#     return HttpResponse(html)
+
+
 def add_wish_list(request, recipient_id):
     user = get_default_user()
     recipient = get_object_or_404(Recipient, id=recipient_id, user=user)
+    
     if request.method == "POST":
         form = WishListForm(request.POST)
         if form.is_valid():
             item = form.save(commit=False)
             item.recipient = recipient
+
+            # Scrape product info from URL
+            product_data = scrape_product(item.item_url)
+            if product_data:
+                item.product_name = product_data.get("name") or ""
+                item.product_image = product_data.get("image") or ""
+                item.product_price = product_data.get("price") or ""
+
             item.save()
             return redirect(request.META.get("HTTP_REFERER", "index"))
 
     else:
         form = WishListForm()
+
     html = render_to_string("partials/wishlist_form.html", {"form": form}, request=request)
     return HttpResponse(html)
 

@@ -3,14 +3,12 @@
 
 {% block content %}
 
-<div class="container mt-4">
+<!-- <div class="container mt-4">
     <h2 class="mb-4">{{ recipient.name }}'s Wish List</h2>
 
-<!-- DELETE MODE BAR -->
 <div class="card shadow-sm mb-4">
     <div class="card-body d-flex justify-content-between align-items-center">
 
-        <!-- Delete Mode Toggle -->
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="toggleDeleteMode">
             <label class="form-check-label fw-semibold" for="toggleDeleteMode">
@@ -18,7 +16,6 @@
             </label>
         </div>
 
-        <!-- Bulk Controls -->
         <div id="deleteControls" class="d-flex align-items-center gap-3 d-none">
 
             <div class="form-check">
@@ -64,19 +61,103 @@
     <p class="text-muted fst-italic">No items in this wish list yet.</p>
 {% endif %}
 
-<!-- ADD BUTTON -->
 <button class="btn btn-primary"
         data-bs-toggle="modal"
         data-bs-target="#addModal"
         onclick="openModal('Add Item to Wish List', `{% url 'add_wish_list' recipient.id %}`)">
     Add Item +
 </button>
+</div> -->
+
+<div class="container mt-4">
+    <h2 class="mb-4">{{ recipient.name }}'s Wish List</h2>
+
+    <!-- DELETE MODE BAR -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+            <!-- Delete Mode Toggle -->
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="toggleDeleteMode">
+                <label class="form-check-label fw-semibold" for="toggleDeleteMode">
+                    Delete Items
+                </label>
+            </div>
+
+            <!-- Bulk Controls -->
+            <div id="deleteControls" class="d-flex align-items-center gap-3 d-none">
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label" for="selectAll">
+                        Select All
+                    </label>
+                </div>
+
+                <button class="btn btn-danger btn-sm px-3"
+                        onclick="openBulkDeleteModal()"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">
+                    <i class="bi bi-trash"></i> Delete Selected
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {% if wishlist_items %}
+        <ul class="list-group mb-4">
+
+            {% for item in wishlist_items %}
+                <li class="list-group-item d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <!-- Image (if exists) -->
+                        {% if item.product_image %}
+                            <img src="{{ item.product_image }}" alt="{{ item.product_name }}" class="img-thumbnail" style="width: 80px; height: auto;">
+                        {% endif %}
+
+                        <div class="d-flex flex-column">
+                            <!-- Name (if exists) -->
+                            {% if item.product_name %}
+                                <a href="{{ item.item_url }}"
+                                   class="fw-semibold text-decoration-none text-primary"
+                                   target="_blank">
+                                    {{ item.product_name }}
+                                </a>
+                            {% else %}
+                                <a href="{{ item.item_url }}"
+                                   class="text-decoration-none fw-semibold text-primary"
+                                   target="_blank">
+                                    {{ item.item_url }}
+                                </a>
+                            {% endif %}
+
+                            <!-- Price (if exists) -->
+                            {% if item.product_price %}
+                                <span class="text-muted small">${{ item.product_price }}</span>
+                            {% endif %}
+                        </div>
+
+                        <input type="checkbox" class="form-check-input delete-checkbox d-none" value="{{ item.id }}">
+                    </div>
+
+                </li>
+            {% endfor %}
+
+        </ul>
+    {% else %}
+        <p class="text-muted fst-italic">No items in this wish list yet.</p>
+    {% endif %}
+
+    <!-- ADD BUTTON -->
+    <button class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addModal"
+            onclick="openModal('Add Item to Wish List', `{% url 'add_wish_list' recipient.id %}`)">
+        Add Item +
+    </button>
 
 </div>
-
-
-
-
-
 
 {% endblock %}

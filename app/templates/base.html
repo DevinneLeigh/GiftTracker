@@ -10,8 +10,74 @@
 </head>
 <body>
     <header>
-        <h1></h1>
-        <!-- navigation -->
+        <nav class="navbar navbar-expand-lg shadow-sm" id="nav">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="/">MySite</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="nav-items">
+
+                        <div>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/">Home</a>
+                            </li>
+                        </div>
+                        <div>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="eventDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                    Events
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="eventDropdown">
+                                    {% for e in all_events %}
+                                        <li>
+                                            <a class="dropdown-item" href="/event/{{ e.id }}/">
+                                                {{ e.event }}
+                                            </a>
+                                        </li>
+                                    {% empty %}
+                                        <li><span class="dropdown-item-text text-muted">(none)</span></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        </div>
+
+                        <div>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="recipientDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                    Wish Lists
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="recipientDropdown">
+                                    {% for r in all_recipients %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'view_wish_list' r.id %}">
+                                                {{ r.name }}
+                                            </a>
+                                        </li>
+                                    {% empty %}
+                                        <li><span class="dropdown-item-text text-muted">No recipients</span></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        </div>
+                    </ul>
+
+                    <!-- Right side -->
+                    <div class="d-flex">
+                        <a href="/login" class="btn btn-outline-light me-2">Login</a>
+                        <a href="/register" class="btn btn-warning">Sign Up</a>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
     </header>
 
     <main>
