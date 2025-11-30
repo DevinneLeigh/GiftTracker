@@ -29,37 +29,42 @@ function openDeleteModal(url, label) {
 
 // Toggle delete mode on/off
 document.addEventListener("DOMContentLoaded", () => {
-    const toggle = document.getElementById("toggleDeleteMode");
-    const controls = document.getElementById("deleteControls");
-    const checkboxes = document.querySelectorAll(".delete-checkbox");
-
-    if (!toggle) return;
-
-    toggle.addEventListener("change", () => {
-        const show = toggle.checked;
-
-        // show/hide controls
-        controls.classList.toggle("d-none", !show);
-
-        // show/hide checkboxes
-        checkboxes.forEach(cb => {
-            cb.classList.toggle("d-none", !show);
-            cb.checked = false;
-        });
-
-        // reset select all
-        const selectAll = document.getElementById("selectAll");
-        if (selectAll) selectAll.checked = false;
-    });
-
-    // Select all functionality
+    const toggle = document.getElementById("bulkDeleteToggle");
+    const boxes = document.querySelectorAll(".delete-checkbox");
     const selectAll = document.getElementById("selectAll");
-    if (selectAll) {
+
+    function updateCheckboxVisibility() {
+        if (toggle.checked) {
+            boxes.forEach(cb => cb.style.visibility = "visible");
+        } else {
+            boxes.forEach(cb => cb.style.visibility = "hidden");
+        }
+    }
+
+    // Run once on page load
+    updateCheckboxVisibility();
+
+    // Run whenever toggle changes
+    toggle.addEventListener("change", updateCheckboxVisibility);
+
+        if (selectAll) {
         selectAll.addEventListener("change", () => {
-            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            const checked = selectAll.checked;
+            boxes.forEach(cb => {
+                cb.checked = checked;
+            });
         });
     }
+
+    boxes.forEach(cb => {
+    cb.addEventListener("change", () => {
+        if (!cb.checked && selectAll.checked) {
+            selectAll.checked = false;
+        }
+    });
 });
+});
+
 
 // Open modal for bulk delete
 function openBulkDeleteModal() {
@@ -91,3 +96,4 @@ function openBulkDeleteModal() {
 }
 
 window.openBulkDeleteModal = openBulkDeleteModal;
+

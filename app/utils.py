@@ -2,6 +2,7 @@ import html
 import re
 from urllib.parse import urlparse
 from django.contrib.auth.models import User
+from decimal import Decimal
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -12,6 +13,15 @@ def get_default_user():
         defaults={"password": "!"},  # unusable password
     )
     return user
+
+def compute_totals(participants):
+    for p in participants:
+        total_spent = sum(Decimal(gift.product_price or 0) for gift in p.gift_set.all())
+        budget_amount = Decimal(p.budget.price) if hasattr(p, "budget") and p.budget else Decimal('0')
+        p.spent = total_spent
+        p.remaining = budget_amount - total_spent
+    return participants
+
 
 def shorten_name(text: str) -> str | None:
     return text.split(",")[0]
@@ -80,6 +90,8 @@ def extract_amazon_image_from_dynamic_image_attr(attr_value: str) -> str | None:
 
     
 def scrape_amazon(url):
+    price = None 
+    
     headers = {
         "User-Agent": "Mozilla/5.0",
         "Accept-Language": "en-US,en;q=0.9",
@@ -199,9 +211,11 @@ def scrape_product(url):
         image = product.get('image')
     elif (store == 'amazon'):
         product = scrape_amazon(url)
-        soup = product.get('soup') # updated soup from more specific amazon scraping function.
-        price = product.get('price')
-        price = price.replace("$", "")
+        if (product):
+            soup = product.get('soup') # updated soup from more specific amazon scraping function.
+            price = product.get('price')
+        if (price):
+            price = price.replace("$", "")
         name_tag = soup.find(id="productTitle")
         if (name_tag):
             name = name_tag.text.strip()

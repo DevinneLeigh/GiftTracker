@@ -1,5 +1,5 @@
 from django import forms
-from .models import Recipient, Event, WishList, Participant, Budget
+from .models import Recipient, Event, WishList, Participant, Budget, Gift
 
 class TemplateFormMixin:
     def to_html(self):
@@ -21,16 +21,13 @@ class WishListForm(TemplateFormMixin, forms.ModelForm):
         model = WishList
         fields = ["item_url"]
 
-# class ParticipantForm(forms.ModelForm):
-#     recipient = forms.ModelChoiceField(
-#         queryset=Recipient.objects.none(),
-#         empty_label="Select a recipient",
-#         widget=forms.Select(attrs={"class": "form-select"})
-#     )
-#     class Meta:
-#         model = Participant
-#         fields = ["recipient"]
-
+class GiftForm(forms.ModelForm):
+    class Meta:
+        model = Gift
+        fields = ["item_url"]
+        widgets = {
+            "item_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "Product URL"})
+        }
 
 class ParticipantForm(forms.ModelForm):
     recipient = forms.ModelChoiceField(

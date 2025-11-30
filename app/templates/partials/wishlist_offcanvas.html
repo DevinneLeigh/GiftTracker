@@ -1,0 +1,31 @@
+<!-- Offcanvas for a single participant's wishlist -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="wishlistOffcanvas{{ participant.id }}" aria-labelledby="wishlistOffcanvasLabel{{ participant.id }}">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="wishlistOffcanvasLabel{{ participant.id }}">Wishlist for {{ participant.recipient.name }}</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <form id="wishlistForm" method="POST" action="{% url 'move_wishlist_to_gifts' participant.id %}">
+      {% csrf_token %}
+      <div class="list-group overflow-auto" style="max-height: 70vh;">
+        {% for item in participant.recipient.wishlist.all %}
+          <label class="list-group-item d-flex align-items-center">
+            <input class="form-check-input me-2" type="checkbox" name="wishlist_item_ids" value="{{ item.id }}">
+            {% if item.product_image %}
+              <img src="{{ item.product_image }}" alt="{{ item.product_name }}" class="img-thumbnail me-2" style="width: 60px; height: auto;">
+            {% endif %}
+            <div class="flex-grow-1">
+              <div>{{ item.product_name|default:item.item_url }}</div>
+              <div class="text-muted small">${{ item.product_price|floatformat:2 }}</div>
+            </div>
+          </label>
+        {% empty %}
+          <p class="text-muted fst-italic">No wishlist items for this participant.</p>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-3 w-100">Add Selected to Gifts</button>
+    </form>
+  </div>
+</div>

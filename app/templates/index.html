@@ -1,102 +1,71 @@
-{% extends "base.html" %}
-{% load static %}
 
-{% block content %}
-
-    <h1 class="mb-4">Gift Tracker</h1>
-    <div class="home_content">
-        <div class="home_left home_panel">
-            <h3 class="fw-bold mb-3">Events</h3>
-            {% if events %}
-                <ul class="list-group event_list">
-                    {% for e in events %}     
-                        <li class="list-group-item event">
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">...</button>
-                                <ul class="dropdown-menu">
-                                    <li><button class="dropdown-item"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#addModal"
-                                    onclick="openModal('Edit Event', `{% url 'edit_event' e.id %}`, 'Save Changes')">
-                                    Edit</button></li>
-                                    <li><button class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/event/{{ e.id }}/delete/', 'event')">Delete</button></li>
-                                </ul>
-                            </div>  
-                            <div><h3>{{ e.event }}</h3></div>                         
-                            {% if participants  %}
-                            <a href="{% url 'view_event' e.id %}" class="btn btn-info btn-sm">View Celebration</a>
-
-                            <div class="participants">
-                                <button class="add_participant"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#addModal"
-                                    onclick="openModal('Add Participant', `{% url 'add_participant' e.id %}`, 'Add')">+</button> 
-                                {% for p in e.participant_set.all %}
-                                        <div class="participant">
-                                            <div class="dropdown">
-                                                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">...</button>
-                                                <ul class="dropdown-menu">
-                                                    <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Participant', `{% url 'edit_participant' p.id %}`)">Edit</button></li>
-                                                    <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/participant/{{ p.id }}/delete/', 'participant')">Delete</button></li>
-                                                </ul>
-                                            </div>
-                                            <div>
-                                                <strong>{{ p.recipient.name }}</strong><br>
-                                                {% if p.budget %}
-                                                    Budget: ${{ p.budget.price|floatformat:2 }}
-                                                {% else %}
-                                                    Budget: N/A
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                {% endfor %} 
-                            </div> 
-                            {% endif %}  
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Event', `{% url 'add_event' %}`)">Add New Event</button>
+{% extends "base.html" %} {% load static %} {% block content %} <h1>Gift Tracker</h1>
+<div class="home_content">
+  <div class="home_left home_panel">
+    <h3 class="fw-bold mb-3">Celebrations</h3>
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Event', `{% url 'add_event' %}`)">Add New Event</button> {% if events %} <ul class="list-group event_list"> {% for e in events %} <li class="list-group-item event">
+        <div class="dropdown">
+          <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">...</button>
+          <ul class="dropdown-menu">
+            <li>
+              <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Event', `{% url 'edit_event' e.id %}`, 'Save Changes')"> Edit</button>
+            </li>
+            <li>
+              <button class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/event/{{ e.id }}/delete/', 'event')"> Delete</button>
+            </li>
+          </ul>
         </div>
-
-        <div class="home_right home_panel">
-            {% if recipients %}
-                <ul class="list-group mb-3 people_list">
-                    {% for r in recipients %}
-                        <li class="list-group-item people">
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">...</button>
-                                <ul class="dropdown-menu">
-                                    <li><button class="dropdown-item"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#addModal"
-                                    onclick="openModal('Edit Recipient', `{% url 'edit_recipient' r.id%}`, 'Save Changes')">Edit</button></li>
-                                    <li><button class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal"onclick="openDeleteModal('/recipient/{{ r.id }}/delete/', 'recipient')">Delete</button></li>
-                                </ul>
-                            </div>
-                            <div class="name"><h3>{{ r.name }}</h3></div>
-                            {% if r.wishlist.all %}
-                            <div class="d-flex flex-row gap-1 justify-content-center">
-                                <div>
-                                    <a href="{% url 'view_wish_list' r.id %}" class="wish_list_button btn btn-primary">View wish list</a>
-                                </div>
-                                <div>
-                                    <button class="wish_list_button btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Item to Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Add items +</button>
-                                </div>
-                            </div>
-                            {% else %}
-                                <div class="d-flex justify-content-center">
-                                    <button class="wish_list_button btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Item to Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Create new wish list +</button>
-                                </div>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-
-            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Recipient', `{% url 'add_recipient' %}`, 'Add Recipient')">Add Person</button>
-        </div>
-    </div>
-
-
-{% endblock %}
+        <div>
+          <h3>{{ e.event }}</h3>
+        </div> {% if participants  %} <a href="{% url 'view_event' e.id %}" class="btn btn-info btn-sm">View Celebration</a>
+        <div class="participants">
+          <button class="add_participant" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Participant', `{% url 'add_participant' e.id %}`, 'Add')"> +</button> {% for p in e.participants_with_totals %} <div class="participant">
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">...</button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Participant', `{% url 'edit_participant' p.id %}`)">Edit</button>
+                </li>
+                <li>
+                  <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/participant/{{ p.id }}/delete/', 'participant')">Delete</button>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <strong>{{ p.recipient.name }}</strong>
+              <br>
+              <h5 class="mb-0 text-muted small">${{ p.remaining|floatformat:2 }} {% if p.remaining >= 0 %}left in budget{% else %}over budget{% endif %}</h5>
+            </div>
+          </div> {% endfor %}
+        </div> {% endif %}
+      </li> {% endfor %} </ul> {% endif %}
+  </div>
+  <div class="home_right">
+    <h3 class="fw-bold mb-3">Wish Lists</h3>
+    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Recipient', `{% url 'add_recipient' %}`, 'Add Recipient')">Add Person</button> {% if recipients %} <div class="background home_panel">
+      <ul class="list-group mb-3 people_list"> {% for r in recipients %} <li class="list-group-item people">
+          <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">...</button>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Recipient', `{% url 'edit_recipient' r.id%}`, 'Save Changes')">Edit</button>
+              </li>
+              <li>
+                <button class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/recipient/{{ r.id }}/delete/', 'recipient')">Delete</button>
+              </li>
+            </ul>
+          </div>
+          <div class="name">
+            <h3>{{ r.name }}</h3>
+          </div> {% if r.wishlist.all %} <div class="d-flex flex-row gap-1 justify-content-center">
+            <div> {% with w=r.wishlist.first %} {% if w %} <a href="{% url 'view_wish_list' w.id r.name %}" class="wish_list_button btn btn-primary"> View wish list </a> {% endif %} {% endwith %} </div>
+            <div>
+              <button class="wish_list_button btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Item to Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Add items +</button>
+            </div>
+          </div> {% else %} <div class="d-flex justify-content-center">
+            <button class="wish_list_button btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Item to Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Create new wish list +</button>
+          </div> {% endif %}
+        </li> {% endfor %} </ul>
+    </div> {% endif %}
+  </div>
+</div> {% endblock %}

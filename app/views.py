@@ -1,17 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.http import JsonResponse
-from django.db.models import Q
+from django.urls import reverse
+from django.db.models import Q, Prefetch
+from decimal import Decimal
 from .forms import TemplateFormMixin, RecipientForm, EventForm, WishListForm, ParticipantForm
 from .models import Recipient, Event, Participant, Gift, Budget, WishList
-from .utils import get_default_user, scrape_product
+from .utils import get_default_user, compute_totals, scrape_product
 
 def index(request):
     recipients = Recipient.objects.all()
-    events = Event.objects.all()
-    participants = Participant.objects.all()
+    events = Event.objects.prefetch_related(
+        Prefetch(
+            'participant_set',
+            queryset=compute_totals(
+                Participant.objects.select_related('recipient').prefetch_related('gift_set')
+            ),
+            to_attr='participants_with_totals'
+        )
+    )
+    for e in events:
+        participants = e.participant_set.prefetch_related('gift_set').all()
+        e.participants_with_totals = compute_totals(participants)
     wishlists = WishList.objects.all()
     recipient_form = RecipientForm()
     event_form = EventForm()
@@ -71,11 +84,16 @@ def delete_event(request, id):
 def view_event(request, id):
     user = get_default_user()
     event = get_object_or_404(Event, id=id, user=user)
-    # participants = Participant.objects.filter(event=event)
-    participants = event.participant_set.select_related("recipient").all()
+    participants = event.participant_set.select_related("recipient").prefetch_related('gift_set').all()
+    participants = compute_totals(participants)
+    recipients = [p.recipient for p in participants]
+    active_tab = request.GET.get("tab")
+
     return render(request, "view_event.html", {
         "event": event,
         "participants": participants,
+        "active_tab": active_tab,
+        "recipients": recipients,
     })
 
 
@@ -124,6 +142,9 @@ def add_participant(request, event_id):
     user = get_default_user()
     event = get_object_or_404(Event, id=event_id, user=user)
     participant = None 
+
+    referer = request.META.get("HTTP_REFERER", "")
+
     if request.method == "POST":
         form = ParticipantForm(request.POST)
         form.fields['recipient'].queryset = Recipient.objects.exclude(participant__event=event)
@@ -137,15 +158,17 @@ def add_participant(request, event_id):
             if budget_amount:
                 Budget.objects.create(participant=participant, price=budget_amount)
             
-            return redirect(request.META.get("HTTP_REFERER", "index"))
+            return redirect(referer or reverse("index"))
 
     else:
         form = ParticipantForm()
-        form.fields['recipient'].queryset = Recipient.objects.exclude(participant__event=event)
+        form.fields['recipient'].queryset = Recipient.objects.exclude(
+            participant__event=event
+        )
 
     html = render_to_string(
         "partials/participant_form.html",
-        {"form": form, "participant": participant}, 
+        {"form": form, "participant": participant},
         request=request
     )
     return HttpResponse(html)
@@ -165,7 +188,8 @@ def edit_participant(request, participant_id):
                 Budget.objects.update_or_create(
                     participant=participant, defaults={"price": budget_value}
                 )
-            return redirect(request.META.get("HTTP_REFERER", "index"))
+            referer = request.META.get("HTTP_REFERER", "")
+            return redirect(referer or reverse("index"))
     else:
         form = ParticipantForm(instance=participant)
         form.fields['recipient'].queryset = Recipient.objects.exclude(participant__event=event) | Recipient.objects.filter(id=participant.recipient.id)
@@ -179,27 +203,12 @@ def delete_participant(request, id):
     participant = get_object_or_404(Participant, id=id, event__user=user)
     if request.method == "POST": 
         participant.delete()
-    return redirect(request.META.get("HTTP_REFERER", "index"))
+    referer = request.META.get("HTTP_REFERER", "")
+    return redirect(referer or reverse("index"))
 
 
 
 # Wistlists
-# def add_wish_list(request, recipient_id):
-#     user = get_default_user()
-#     recipient = get_object_or_404(Recipient, id=recipient_id, user=user)
-#     if request.method == "POST":
-#         form = WishListForm(request.POST)
-#         if form.is_valid():
-#             item = form.save(commit=False)
-#             item.recipient = recipient
-#             item.save()
-#             return redirect(request.META.get("HTTP_REFERER", "index"))
-
-#     else:
-#         form = WishListForm()
-#     html = render_to_string("partials/wishlist_form.html", {"form": form}, request=request)
-#     return HttpResponse(html)
-
 
 def add_wish_list(request, recipient_id):
     user = get_default_user()
@@ -227,13 +236,17 @@ def add_wish_list(request, recipient_id):
     html = render_to_string("partials/wishlist_form.html", {"form": form}, request=request)
     return HttpResponse(html)
 
-def view_wish_list(request, recipient_id):
-    recipient = get_object_or_404(Recipient, id=recipient_id)
+def view_wish_list(request, wishlist_id, name):
+    wishlist = get_object_or_404(WishList, id=wishlist_id)
+
+    recipient = wishlist.recipient
     wishlist_items = recipient.wishlist.all()
+
     return render(request, 'view_wish_list.html', {
         'recipient': recipient,
         'wishlist_items': wishlist_items,
     })
+
 
 def delete_wish_list(request, id):
     user = get_default_user()
@@ -253,5 +266,54 @@ def bulk_delete_wish_list(request):
         ).delete()
     return redirect(request.META.get("HTTP_REFERER", "index"))
 
+
+# Gifts
+def add_gift(request, participant_id):
+    participant = get_object_or_404(Participant, id=participant_id)
+    event = participant.event
+    
+    if request.method == "POST":
+        from .forms import GiftForm 
+        form = GiftForm(request.POST)
+        if form.is_valid():
+            gift = form.save(commit=False)
+            gift.participant = participant
+
+            # Scrape product info from URL
+            product_data = scrape_product(gift.item_url)
+            if product_data:
+                gift.product_name = product_data.get("name") or ""
+                gift.product_image = product_data.get("image") or ""
+                gift.product_price = product_data.get("price") or ""
+
+            gift.save()
+            return redirect(f"{reverse('view_event', args=[event.id])}?tab=tab-{participant.id}")
+    else:
+        from .forms import GiftForm
+        form = GiftForm()
+
+    html = render_to_string("partials/gift_form.html", {"form": form, "participant": participant}, request=request)
+    return HttpResponse(html)
+
+
+
+
+@require_POST
+def move_wishlist_to_gifts(request, participant_id):
+    participant = get_object_or_404(Participant, id=participant_id)
+    
+    selected_ids = request.POST.getlist("wishlist_item_ids")
+    for item_id in selected_ids:
+        wishlist_item = get_object_or_404(WishList, id=item_id)
+        Gift.objects.create(
+            participant=participant,
+            item_url=wishlist_item.item_url,
+            product_name=wishlist_item.product_name,
+            product_image=wishlist_item.product_image,
+            product_price=wishlist_item.product_price
+        )
+        wishlist_item.delete()
+    
+    return redirect(reverse("view_event", args=[participant.event.id]))
 
 
