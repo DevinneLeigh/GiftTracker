@@ -25,9 +25,15 @@ $xxl: 1400px;
 
 }
 **/
+$w: #F5F6E8;
+$g1: #2E2D2B;
+$g2: #292826;
+$g3: #242321;
+$g4: #1F1F1D;
+$g5: #1A1A18;
+$g6: #141413;
+$accent: #6251A2;
 
-$grey: #d8d2ce;
-$light-grey: #ede7e1;
 
 
 
@@ -43,11 +49,18 @@ $light-grey: #ede7e1;
 @mixin gt($width) { @media (min-width: $width) { @content; } }
 @mixin between($width1, $width2) { @media (min-width: $width1) and (max-width: $width2) { @content; } }
 
+h1, h2, h3, h4, h5, p, a, button{
+    color: $w;
+}
 
 * {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
+}
+
+body{
+    background: $g2;
 }
 
 .page-content{
@@ -60,15 +73,82 @@ $light-grey: #ede7e1;
 }
 
 #nav{
-    background: $grey;
+    background: $g5;
     #nav-items {
         display: flex;
         align-items: center;
+        button {
+            text-decoration: none;
+        }
+        a {
+            color: $w;
+        }
+    }
+}
+
+.modal-content {
+    background: $g6;
+    .modal-header{
+        border-bottom: solid $g5 2px;
+        button.btn-close{
+            color: $w;
+        }
+    }
+    .modal-body{
+        color: $w;
+        input, .form-select{
+            background: $g4;
+            color: $w;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+    }
+    .modal-footer{
+        border-top: solid $g5 2px;
+        button {
+            padding: 5px 10px;
+            border-radius: 10px;
+            border: none;
+        }
+        .cancel{
+            background: $g1;
+        }
+        .submit{
+            background: $accent;
+        }
+    }
+}
+
+.offcanvas{
+    background: $g2;
+    .list-group-item{
+        background: $g4;
+        color: $w;
+        border: none;
+    }
+    .offcanvas-button{
+        background: $accent;
+        width: 100%;
+        padding: 10px;
+        border-radius: 20px;
+        border: none;
+        margin-top: 10px;
     }
 }
 
 #eventDropdown, #recipientDropdown {
     padding-top: 8px;
+}
+
+.dropdown-menu{
+    background: $g6;
+    .dropdown-item {
+        color: $w;
+    }
+}
+.dropdown-item:hover{
+    background: $accent;
 }
 
 h3 {
@@ -92,10 +172,11 @@ h3 {
         width: 25%;
     }
     .background{
-        background: $light-grey;
+        background: $g5;
         padding: 10px;
     }
 }
+
 
 .event_list{
     display: flex;
@@ -104,24 +185,61 @@ h3 {
         border-radius: 10px;
         border: none;
         border-radius: 10px;
-        background: $light-grey;
+        background: $g5;
         padding: 5px 20px 30px 20px;
+    }
+}
+.button-wrapper{
+    display: flex;
+    justify-content: center;
+    .button{
+        margin-top: 20px;
+        text-decoration: none;
+        text-align: center;
+        padding: 5px 20px;
+        width: 40%;
+        background: $accent;
+        border-radius: 10px;
     }
 }
 
 .participants{
     display: flex;
-    flex-flow: row;
+    flex-flow: wrap;
+    justify-content: center;
+    align-items: center;
     gap: 10px;
-    .participant{
-        padding: 20px;
-        background: #ffffff;
+    text-align: center;
+    .add-participant{
+        border: none;
         border-radius: 10px;
         margin-top: 10px;
+        background: $g6;
+        width: 92.6px;
+        height: 92.6px;
+        font-size: 30px;
+    }
+    .participant{
+        height: 92.6px;
+        padding: 0 15px 15px 15px;
+        background: $g6;
+        color: $w;
+        border-radius: 10px;
+        margin-top: 10px;
+        h4{
+            font-size: 18px;;
+        }
+        p{
+            font-size: 12px;
+        }
     }
 }
 .name{
  text-align: center;
+}
+
+.dots{
+    color: #A7A8A3;
 }
 
 .people_list{
@@ -129,8 +247,8 @@ h3 {
     gap: 15px;
     .people{
         border: none;
+        background: $g6;
         border-radius: 10px;
-        background: #ffffff;
         padding-bottom: 30px;
     }
 }
@@ -157,7 +275,7 @@ h3 {
     display: flex;
     gap: 10px;
     .wish-list-item-wrapper{
-        background: $grey;
+        background: $g5;
         padding: 5px;
         border-radius: 5px;
         height: 150px;
@@ -167,6 +285,20 @@ h3 {
                 width: 150px;
             }
         }
+    }
+}
+.wish-list-button-group{
+    display: flex; 
+    flex-flow: row;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    .wish-list-button {
+        text-decoration: none;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 10px;
+        background: $accent;
     }
 }
 
