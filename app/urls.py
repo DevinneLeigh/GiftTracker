@@ -35,12 +35,10 @@ urlpatterns = [
     path("participant/<int:participant_id>/add-gift/", views.add_gift, name="add_gift"),
 
 
+    path('recipient/<int:recipient_id>/add_wish_list/', views.add_wish_list, name='add_wish_list'),
+    path('participant/<int:participant_id>/add-gift/', views.add_gift, name='add_gift'),
 
-
-
-
-
-    # path("event/edit-dropdown/", views.edit_event_dropdown, name="edit_event_dropdown"),
-    # path("participant/edit-dropdown/", views.edit_participant_dropdown, name="edit_participant_dropdown"),
-
+    # new shared AJAX endpoint for scraping
+    path('scrape-product/', views.scrape_product_ajax, name='scrape_product_ajax'),
 ]
+

@@ -87,7 +87,7 @@
       class="btn btn-primary"
       data-bs-toggle="modal"
       data-bs-target="#addModal"
-      onclick="openModal('Add Item to {{ r.name }}\'s Wish List', `{% url 'add_wish_list' recipient.id %}`)">
+      onclick="giftModal('Add Item to {{ r.name }}\'s Wish List', `{% url 'add_wish_list' recipient.id %}`)">
       Add Item +
    </button>
 </div>

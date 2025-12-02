@@ -26,7 +26,7 @@
                 show active
             {% endif %}" id="content-{{ p.id }}" role="tabpanel">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <button class="green-button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Gift for {{ p.recipient.name }}', `{% url 'add_gift' p.id %}`)"> Add New Gift + </button>
+        <button class="green-button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="giftModal('Add Gift for {{ p.recipient.name }}', `{% url 'add_gift' p.id %}`)"> Add New Gift + </button>
         <button class="green-button" data-bs-toggle="offcanvas" data-bs-target="#wishlistOffcanvas{{ p.id }}" aria-controls="wishlistOffcanvas">Add From Wish List + </button>
       <h5 class="mb-0"> {% if p.budget %} <span class="">Budget: ${{ p.budget.price|floatformat:2 }}</span> {% endif %} </h5>
       <h5 class="mb-0">

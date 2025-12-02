@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
-from django.http import JsonResponse
 from django.urls import reverse
 from django.db.models import Q, Prefetch
 from decimal import Decimal
@@ -225,12 +224,24 @@ def add_wish_list(request, recipient_id):
             item = form.save(commit=False)
             item.recipient = recipient
 
-            # Scrape product info from URL
-            product_data = scrape_product(item.item_url)
-            if product_data:
-                item.product_name = product_data.get("name") or ""
-                item.product_image = product_data.get("image") or ""
-                item.product_price = product_data.get("price") or ""
+            posted_name = request.POST.get("product_name")
+            posted_price = request.POST.get("product_price")
+            posted_image = request.POST.get("product_image") 
+
+            if posted_name or posted_price or posted_image:
+                if posted_name is not None:
+                    item.product_name = posted_name
+                if posted_price is not None:
+                    item.product_price = posted_price
+                if posted_image is not None:
+                    item.product_image = posted_image
+            else:
+                # Scrape product info from URL
+                product_data = scrape_product(item.item_url)
+                if product_data:
+                    item.product_name = product_data.get("name") or ""
+                    item.product_image = product_data.get("image") or ""
+                    item.product_price = product_data.get("price") or ""
 
             item.save()
             return redirect(request.META.get("HTTP_REFERER", "index"))
@@ -284,12 +295,24 @@ def add_gift(request, participant_id):
             gift = form.save(commit=False)
             gift.participant = participant
 
-            # Scrape product info from URL
-            product_data = scrape_product(gift.item_url)
-            if product_data:
-                gift.product_name = product_data.get("name") or ""
-                gift.product_image = product_data.get("image") or ""
-                gift.product_price = product_data.get("price") or ""
+            posted_name = request.POST.get("product_name")
+            posted_price = request.POST.get("product_price")
+            posted_image = request.POST.get("product_image")
+
+            if posted_name or posted_price or posted_image:
+                if posted_name is not None:
+                    gift.product_name = posted_name
+                if posted_price is not None:
+                    gift.product_price = posted_price
+                if posted_image is not None:
+                    gift.product_image = posted_image     
+            else:
+                # Scrape product info from URL
+                product_data = scrape_product(gift.item_url)
+                if product_data:
+                    gift.product_name = product_data.get("name") or ""
+                    gift.product_image = product_data.get("image") or ""
+                    gift.product_price = product_data.get("price") or ""
 
             gift.save()
             return redirect(f"{reverse('view_event', args=[event.id])}?tab=tab-{participant.id}")
@@ -323,3 +346,31 @@ def move_wishlist_to_gifts(request, participant_id):
 
 
 
+
+@require_POST
+def scrape_product_ajax(request):
+    """
+    Shared AJAX endpoint used by the modal to fetch scraped product data
+    without saving the DB object yet.
+    Expects POST with 'item_url' (form field name).
+    Returns JSON: {name, price, image} or {error: "..."}.
+    """
+    url = request.POST.get("item_url") or request.POST.get("url")
+    if not url:
+        return JsonResponse({"error": "No URL provided."}, status=400)
+
+    product_data = scrape_product(url)
+    if not product_data:
+        return JsonResponse({"error": "Could not extract product info."}, status=404)
+
+    # normalize price to string for the UI
+    price = product_data.get("price") or ""
+    # if it's a float, make into simple string
+    if isinstance(price, (int, float)):
+        price = str(price)
+
+    return JsonResponse({
+        "name": product_data.get("name") or "",
+        "price": price,
+        "image": product_data.get("image") or ""
+    })

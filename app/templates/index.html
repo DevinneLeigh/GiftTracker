@@ -64,13 +64,13 @@
           </div> {% if r.wishlist.all %} 
           <div class="wish-list-button-group">
 
-              <a class="green-button button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Item to {{ r.name }}\'s Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Add items +</a>
+              <a class="green-button button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="giftModal('Add Item to {{ r.name }}\'s Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Add items +</a>
 
             {% with w=r.wishlist.first %} {% if w %}<a href="{% url 'view_wish_list' w.id r.name %}" class="purple-button button"> View Wish List </a> {% endif %} {% endwith %}
           </div> 
           {% else %} 
           <div class="wish-list-button-group">
-            <a class="green-button button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Item to {{ r.name }}\'s Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Create new wish list +</a>
+            <a class="green-button button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="giftModal('Add Item to {{ r.name }}\'s Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Create new wish list +</a>
           </div> {% endif %}
         </li> {% endfor %} </ul>
     </div> {% endif %}
