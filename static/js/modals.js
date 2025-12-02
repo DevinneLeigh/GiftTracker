@@ -16,6 +16,7 @@ function openModal(title, url) {
         });
 }
 
+
 // Open Delete Modal
 function openDeleteModal(url, label) {
     const form = document.getElementById("deleteForm");
@@ -25,6 +26,7 @@ function openDeleteModal(url, label) {
     document.getElementById("deleteModalBody").textContent =
         `Are you sure you want to delete this ${label}?`;
 }
+
 
 
 // Toggle delete mode on/off

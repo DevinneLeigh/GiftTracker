@@ -26,13 +26,19 @@ $xxl: 1400px;
 }
 **/
 $w: #F5F6E8;
+$w2: #DADBCE;
+$w3: #706E68;
 $g1: #2E2D2B;
 $g2: #292826;
 $g3: #242321;
 $g4: #1F1F1D;
 $g5: #1A1A18;
 $g6: #141413;
-$accent: #6251A2;
+// $purple: #6251A2;
+$purple: #5D4D99;
+$purple2: #7560C0;
+$green: #2C7A63;
+$green2: #36A379;
 
 
 
@@ -52,6 +58,34 @@ $accent: #6251A2;
 h1, h2, h3, h4, h5, p, a, button{
     color: $w;
 }
+.w2 {
+    color: $w2;
+}
+.green-button{
+    background-image: linear-gradient(to bottom, $green, $green2);
+}
+.purple-button{
+    background-image: linear-gradient(to bottom, $purple, $purple2);
+}
+.green-button, .purple-button{
+    text-decoration: none;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin-top: 15px;
+    text-align: center;
+}
+.green-button:hover, .purple-button:hover{
+    color: white;
+    transform: scale(1.01);
+    transition: 0.2s;
+}
+.green-button:hover{
+    background-image: linear-gradient(to bottom, $green2, $green);
+}
+.purple-button:hover{
+    background-image: linear-gradient(to bottom, $purple2, $purple);
+}
 
 * {
 	box-sizing: border-box;
@@ -60,7 +94,8 @@ h1, h2, h3, h4, h5, p, a, button{
 }
 
 body{
-    background: $g2;
+    //background: $g3;
+    background-image: linear-gradient(to bottom right, $g2, $g6);
 }
 
 .page-content{
@@ -73,7 +108,7 @@ body{
 }
 
 #nav{
-    background: $g5;
+    background: $g6;
     #nav-items {
         display: flex;
         align-items: center;
@@ -108,14 +143,20 @@ body{
         border-top: solid $g5 2px;
         button {
             padding: 5px 10px;
-            border-radius: 10px;
+            border-radius: 15px;
             border: none;
         }
         .cancel{
-            background: $g1;
+            background-image: linear-gradient(to bottom, #474642, $g1);
+        }
+        .cancel:hover{
+            background-image: linear-gradient(to bottom, $g1, #474642);
         }
         .submit{
-            background: $accent;
+            background-image: linear-gradient(to bottom, $green, $green2);
+        }
+        .submit:hover{
+            background-image: linear-gradient(to bottom, $green2, $green);
         }
     }
 }
@@ -127,13 +168,10 @@ body{
         color: $w;
         border: none;
     }
-    .offcanvas-button{
-        background: $accent;
-        width: 100%;
-        padding: 10px;
-        border-radius: 20px;
-        border: none;
-        margin-top: 10px;
+    .offcanvas-body{
+        button{
+            width: 100%;
+        }
     }
 }
 
@@ -148,7 +186,7 @@ body{
     }
 }
 .dropdown-item:hover{
-    background: $accent;
+    background: $purple;
 }
 
 h3 {
@@ -156,49 +194,66 @@ h3 {
     text-align: center;
 }
 
-.home_content{
+.home-content{
     display: flex;
-    flex-flow: row;
-    justify-content: space-around;
-    align-items: flex-start;
-    //margin: 20px;
-    .home_panel{
-        border-radius: 10px;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    @include lg { // 960px
+        gap: 1%;
+        flex-flow: row;
+        align-items: flex-start;
+        margin: 0 15px;
     }
-    .home_left {
-        width: 65%;
+    @include xxl { //1400px
+        gap: 3%;
+        margin: 0 30px;
     }
-    .home_right{
-        width: 25%;
+
+    .home-left {
+        width: 98%;
+        //margin: 40px;
+        @include lg { // 960px
+            width: 75%;
+            margin: 0;
+        }
+        .event_list{
+            display: flex;
+            gap: 15px;
+            .event{
+                border-radius: 10px;
+                border: none;
+                border-radius: 10px;
+                background: $g4;
+                padding: 5px 5px 30px 5px;
+                .button-wrapper{
+                    display: flex;
+                    justify-content: center;
+                    .button{
+                        width: 238px;
+                        @include lg { // 960px
+                            width: 400px;
+                        }   
+                    }
+                }
+
+            }
+        }
+    }
+    .home-right{
+        padding: 20px;
+        margin: 10px;
+        @include lg { // 960px
+            width: 25%;
+            margin: 0;
+            padding: 0;
+        }
     }
     .background{
-        background: $g5;
+        background: $g4;
+        //background-image: linear-gradient(to bottom right, $g6, $g3);
         padding: 10px;
-    }
-}
-
-
-.event_list{
-    display: flex;
-    gap: 15px;
-    .event{
-        border-radius: 10px;
-        border: none;
-        border-radius: 10px;
-        background: $g5;
-        padding: 5px 20px 30px 20px;
-    }
-}
-.button-wrapper{
-    display: flex;
-    justify-content: center;
-    .button{
-        margin-top: 20px;
-        text-decoration: none;
-        text-align: center;
-        padding: 5px 20px;
-        width: 40%;
-        background: $accent;
         border-radius: 10px;
     }
 }
@@ -208,29 +263,79 @@ h3 {
     flex-flow: wrap;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    //gap: 10px;
+    gap: 8px;
     text-align: center;
+    .dots{
+        margin-top: -10px;
+        margin-right: 3px;
+        @include md { // 768px
+            margin-right: 6px;
+        }
+    }
     .add-participant{
         border: none;
         border-radius: 10px;
         margin-top: 10px;
-        background: $g6;
-        width: 92.6px;
-        height: 92.6px;
+        //background: $g6;
+        background-image: linear-gradient(to bottom, $g6, $g5);
+        width: 105px;
+        height: 84px;
         font-size: 30px;
+        @include sm { // 576px
+            width: 130px;
+            height: 88.2px;
+        }
+        @include md { // 768px
+            width: 135px;
+            height: 99px;
+        }
     }
     .participant{
-        height: 92.6px;
-        padding: 0 15px 15px 15px;
-        background: $g6;
+        //height: 92.6px;
+        width: 105px;
+        padding: 0 2px 12.2px 2px;
+        //padding: 0 15px 15px 15px;
+        //background: $g6;
+        background-image: linear-gradient(to bottom, $g6, $g5);
         color: $w;
         border-radius: 10px;
         margin-top: 10px;
+        @include sm { // 576px
+            width: 130px;
+        }
+        @include md { // 768px
+            width: 135px;
+            padding: 0 2px 18.8px 2px;
+        }
+        @include lg { // 960px
+
+        }
+        @include xl { // 1200px
+
+        }
+        @include xxl { // 1400px
+
+        }
         h4{
-            font-size: 18px;;
+            font-size: 14px;
+            margin-top: -10px;
+            @include sm { // 576px
+                font-size: 15px;
+            }
+            @include md { // 768px
+                font-size: 16px;
+            }
         }
         p{
-            font-size: 12px;
+            font-size: 11px;
+            margin: 0 8px 0 8px;
+            @include sm { // 576px
+                font-size: 12px;
+            }
+            @include md { // 768px
+                font-size: 13px;
+            }
         }
     }
 }
@@ -242,12 +347,16 @@ h3 {
     color: #A7A8A3;
 }
 
-.people_list{
+.people-list{
     display: flex;
+    flex-flow: wrap;
+    justify-content: center;
     gap: 15px;
     .people{
         border: none;
-        background: $g6;
+        width: 270px;
+        //background: $g6;
+        background-image: linear-gradient(to bottom, $g6, $g5);
         border-radius: 10px;
         padding-bottom: 30px;
     }
@@ -271,34 +380,80 @@ h3 {
     }
 }
 
-.wish-list {
+.wish-list-button-group{
     display: flex;
-    gap: 10px;
-    .wish-list-item-wrapper{
-        background: $g5;
-        padding: 5px;
-        border-radius: 5px;
-        height: 150px;
-        .wish-list-item {
-            .img-thumbnail {
-                height: auto;
+    flex-flow: column;
+    .button{
+        margin-top: 5px;
+        width: 100%
+    }
+}
+
+.nav{
+    color: $w;
+    .nav-item{
+        font-size: 22px;
+        .nav-link{
+            color: $w;
+            background: $g6;
+            border-bottom: 2px solid $purple2;
+            border-radius: 20px 20px 0 0;
+        }
+        .active{
+            border: 2px solid $purple2;
+            border-bottom: none;
+            background: #ffffff00;
+            border-radius: 20px 20px 0 0;
+        }
+        .add {
+            color: $w3;
+        }
+    }
+    .hanging{
+        border-bottom: 2px solid $purple2;
+        width: 100px;
+    }
+}
+h5{
+    span{
+        color: $w;
+    }
+}
+
+.gift-list {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    gap: 20px;
+    .gift{
+        text-decoration: none;
+        list-style: none;
+        background: $g1;
+        color: $w2;
+        padding: 20px;
+        border-radius: 10px;
+        border: none;
+        height: 190px;
+        .gift-box{
+            height: 100%;
+            display: flex;
+            flex-flow: row;
+            align-items: center;
+            gap: 15px;
+            img{
                 width: 150px;
+            }
+            .gift-info{
+                display: flex;
+                flex-flow: column;
             }
         }
     }
 }
-.wish-list-button-group{
-    display: flex; 
-    flex-flow: row;
-    gap: 5px;
-    justify-content: center;
-    align-items: center;
-    .wish-list-button {
-        text-decoration: none;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 10px;
-        background: $accent;
-    }
+
+.empty {
+    height: 500px;
+    margin-top: 100px;
+    text-align: center;
 }
 

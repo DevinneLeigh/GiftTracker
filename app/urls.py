@@ -34,4 +34,13 @@ urlpatterns = [
     #Gifts
     path("participant/<int:participant_id>/add-gift/", views.add_gift, name="add_gift"),
 
+
+
+
+
+
+
+    # path("event/edit-dropdown/", views.edit_event_dropdown, name="edit_event_dropdown"),
+    # path("participant/edit-dropdown/", views.edit_participant_dropdown, name="edit_participant_dropdown"),
+
 ]

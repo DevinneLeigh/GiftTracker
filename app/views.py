@@ -25,6 +25,11 @@ def index(request):
     for e in events:
         participants = e.participant_set.prefetch_related('gift_set').all()
         e.participants_with_totals = compute_totals(participants)
+
+
+    participants = Participant.objects.select_related('recipient', 'event').all()
+
+
     wishlists = WishList.objects.all()
     recipient_form = RecipientForm()
     event_form = EventForm()
@@ -168,7 +173,7 @@ def add_participant(request, event_id):
 
     html = render_to_string(
         "partials/participant_form.html",
-        {"form": form, "participant": participant},
+        {"form": form, "participant": participant, "event": Event.objects.all()},
         request=request
     )
     return HttpResponse(html)
@@ -315,5 +320,6 @@ def move_wishlist_to_gifts(request, participant_id):
         wishlist_item.delete()
     
     return redirect(reverse("view_event", args=[participant.event.id]))
+
 
 
