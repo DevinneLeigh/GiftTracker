@@ -249,7 +249,7 @@ def add_wish_list(request, recipient_id):
     else:
         form = WishListForm()
 
-    html = render_to_string("partials/wishlist_form.html", {"form": form}, request=request)
+    html = render_to_string("partials/gift_form.html", {"form": form}, request=request)
     return HttpResponse(html)
 
 def view_wish_list(request, wishlist_id, name):

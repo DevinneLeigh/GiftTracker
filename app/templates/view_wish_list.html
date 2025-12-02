@@ -83,12 +83,6 @@
    <p class="text-muted fst-italic">No items in this wish list yet.</p>
    {% endif %}
    <!-- ADD BUTTON -->
-   <button
-      class="btn btn-primary"
-      data-bs-toggle="modal"
-      data-bs-target="#addModal"
-      onclick="giftModal('Add Item to {{ r.name }}\'s Wish List', `{% url 'add_wish_list' recipient.id %}`)">
-      Add Item +
-   </button>
+   <a class="green-button button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="giftModal('Add Item to {{ recipient.name }}\'s Wish List', `{% url 'add_wish_list' recipient.id %}`, 'Add Item')">Add Item +</a>
 </div>
 {% endblock %}
