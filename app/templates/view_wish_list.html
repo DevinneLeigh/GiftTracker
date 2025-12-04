@@ -46,6 +46,18 @@
                 class="form-check-input delete-checkbox"
                 value="{{ item.id }}"/>
             </div>
+                        <!-- Dropdown for Edit/Delete -->
+            <div class="dropdown">
+               <button class="btn dropdown-toggle dots" type="button" data-bs-toggle="dropdown"> ... </button>
+               <ul class="dropdown-menu">
+                  <li>
+                  <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="editGiftModal('Edit Item', `{% url 'edit_wish_list' item.id %}`)"> Edit </button>
+                  </li>
+                  <li>
+                  <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal(`{% url 'delete_wish_list' item.id %}`, 'wishlist')"> Delete </button>
+                  </li>
+               </ul>
+            </div>
             <!-- Image (if exists) -->
             {% if item.product_image %}
             <img

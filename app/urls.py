@@ -20,9 +20,18 @@ urlpatterns = [
 
     # Wish List
     path('recipient/<int:recipient_id>/add_wish_list/', views.add_wish_list, name='add_wish_list'),
+    path("wishlist/<int:wish_id>/edit/", views.edit_wish_list, name="edit_wish_list"),
     path('<int:wishlist_id>/<str:name>/wishlist/', views.view_wish_list, name='view_wish_list'),
     path("wishlist/<int:id>/delete/", views.delete_wish_list, name="delete_wish_list"),
     path("wishlist/bulk_delete/", views.bulk_delete_wish_list, name="bulk_delete_wish_list"),
+
+    # Add/Edit/Delete WishList URLs
+    # path('recipient/<int:recipient_id>/wishlist/', views.view_wish_list, name='view_wish_list'),
+    # path('recipient/<int:recipient_id>/add_wish_list/', views.add_wish_list, name='add_wish_list'),
+    # path('wishlist/<int:wish_id>/edit/', views.edit_wish_list, name='edit_wish_list'),
+    # path('wishlist/<int:id>/delete/', views.delete_wish_list, name='delete_wish_list'),
+    # path('wishlist/bulk_delete/', views.bulk_delete_wish_list, name='bulk_delete_wish_list'),
+
 
 
     # Participants
@@ -33,6 +42,7 @@ urlpatterns = [
 
     #Gifts
     path("participant/<int:participant_id>/add-gift/", views.add_gift, name="add_gift"),
+    path("participant/<int:gift_id>/edit-gift", views.edit_gift, name="edit_gift"),
 
 
     path('recipient/<int:recipient_id>/add_wish_list/', views.add_wish_list, name='add_wish_list'),
@@ -40,5 +50,7 @@ urlpatterns = [
 
     # new shared AJAX endpoint for scraping
     path('scrape-product/', views.scrape_product_ajax, name='scrape_product_ajax'),
+
+
 ]
 

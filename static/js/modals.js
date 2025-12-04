@@ -222,6 +222,84 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
+// function editGiftModal(title, url) {
+//     const modalTitle = document.getElementById("addModalTitle");
+//     modalTitle.textContent = title;
+
+//     // Load edit form
+//     fetch(url)
+//         .then(resp => resp.text())
+//         .then(html => {
+//             document.getElementById("addModalBody").innerHTML = html;
+
+//             // Update form action
+//             const form = document.getElementById("addModalForm");
+//             form.action = url;
+
+//             // Remove search functionality completely
+//             const submitBtn = form.querySelector("button[type='submit']");
+//             if (submitBtn) {
+//                 submitBtn.textContent = "Submit";
+//                 submitBtn.dataset.mode = "submit";  // ALWAYS submit
+//             }
+
+//             // Show edit fields right away
+//             const results = document.getElementById("scrapeResults");
+//             if (results) results.style.display = "block";
+//         });
+// }
+
+
+function editGiftModal(title, url) {
+    const modalTitle = document.getElementById("addModalTitle");
+    modalTitle.textContent = title;
+
+    fetch(url)
+        .then(resp => resp.text())
+        .then(html => {
+            const modalBody = document.getElementById("addModalBody");
+            modalBody.innerHTML = html;
+
+            const form = document.getElementById("addModalForm");
+            form.action = url;
+
+            const submitBtn = form.querySelector("button[type='submit']");
+            if (submitBtn) submitBtn.dataset.mode = "edit"; // mark as edit
+        });
+}
+
+// Intercept the edit form submit
+document.addEventListener("submit", function(e) {
+    const form = e.target;
+    const submitBtn = form.querySelector("button[type='submit']");
+    if (!submitBtn) return;
+    const mode = submitBtn.dataset.mode;
+    if (mode === "edit") {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const csrftoken = getCookie("csrftoken");
+
+        fetch(form.action, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrftoken },
+            body: formData,
+        })
+        .then(resp => resp.text())
+        .then(html => {
+            // close modal and refresh page or update table
+            const modalEl = document.getElementById("addModal");
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+
+            // optionally reload the gifts table
+            location.reload();
+        });
+    }
+});
+
+
+
 
 // Open Delete Modal
 function openDeleteModal(url, label) {

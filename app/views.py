@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.db.models import Q, Prefetch
 from decimal import Decimal
-from .forms import TemplateFormMixin, RecipientForm, EventForm, WishListForm, ParticipantForm
+from .forms import TemplateFormMixin, RecipientForm, EventForm, WishListForm, ParticipantForm, GiftForm 
 from .models import Recipient, Event, Participant, Gift, Budget, WishList
 from .utils import get_default_user, compute_totals, scrape_product
 
@@ -211,13 +211,10 @@ def delete_participant(request, id):
     return redirect(referer or reverse("index"))
 
 
-
-# Wistlists
-
 def add_wish_list(request, recipient_id):
     user = get_default_user()
     recipient = get_object_or_404(Recipient, id=recipient_id, user=user)
-    
+
     if request.method == "POST":
         form = WishListForm(request.POST)
         if form.is_valid():
@@ -226,7 +223,7 @@ def add_wish_list(request, recipient_id):
 
             posted_name = request.POST.get("product_name")
             posted_price = request.POST.get("product_price")
-            posted_image = request.POST.get("product_image") 
+            posted_image = request.POST.get("product_image")
 
             if posted_name or posted_price or posted_image:
                 if posted_name is not None:
@@ -236,7 +233,6 @@ def add_wish_list(request, recipient_id):
                 if posted_image is not None:
                     item.product_image = posted_image
             else:
-                # Scrape product info from URL
                 product_data = scrape_product(item.item_url)
                 if product_data:
                     item.product_name = product_data.get("name") or ""
@@ -245,17 +241,55 @@ def add_wish_list(request, recipient_id):
 
             item.save()
             return redirect(request.META.get("HTTP_REFERER", "index"))
-
     else:
         form = WishListForm()
 
-    html = render_to_string("partials/gift_form.html", {"form": form}, request=request)
+    # Use the gift_form partial for both if you want the same markup.
+    html = render_to_string("partials/gift_form.html", {"form": form, "recipient": recipient}, request=request)
     return HttpResponse(html)
 
-def view_wish_list(request, wishlist_id, name):
-    wishlist = get_object_or_404(WishList, id=wishlist_id)
 
-    recipient = wishlist.recipient
+
+def edit_wish_list(request, wish_id):
+    item = get_object_or_404(WishList, id=wish_id)
+    recipient = item.recipient
+
+    if request.method == "POST":
+        # Directly update the fields from the POST data
+        item.product_name = request.POST.get("product_name", item.product_name)
+        item.product_price = request.POST.get("product_price", item.product_price)
+        item.product_image = request.POST.get("product_image", item.product_image)
+        item.save()
+
+        # Redirect back to the recipient's page (or wherever appropriate)
+        return redirect(request.META.get("HTTP_REFERER", "index"))
+
+    html = render_to_string(
+        "partials/gift_form.html",
+        {"gift": item, "edit_mode": True},
+        request=request
+    )
+    return HttpResponse(html)
+
+
+
+# def view_wish_list(request, wishlist_id, name):
+#     wishlist = get_object_or_404(WishList, id=wishlist_id)
+
+#     recipient = get_object_or_404(Recipient, id=wishlist_id)
+#     wishlist_items = recipient.wishlist.all()
+
+#     return render(request, 'view_wish_list.html', {
+#         'recipient': recipient,
+#         'wishlist_items': wishlist_items,
+#     })
+
+def view_wish_list(request, wishlist_id, name):
+    """
+    wishlist_id is actually the recipient ID in your URLs. We'll get the recipient,
+    then fetch all their wishlist items.
+    """
+    recipient = get_object_or_404(Recipient, id=wishlist_id)
     wishlist_items = recipient.wishlist.all()
 
     return render(request, 'view_wish_list.html', {
@@ -271,6 +305,7 @@ def delete_wish_list(request, id):
         item.delete()
     return redirect(request.META.get("HTTP_REFERER", "index"))
 
+
 def bulk_delete_wish_list(request):
     user = get_default_user()
     if request.method == "POST":
@@ -283,31 +318,31 @@ def bulk_delete_wish_list(request):
     return redirect(request.META.get("HTTP_REFERER", "index"))
 
 
-# Gifts
 def add_gift(request, participant_id):
     participant = get_object_or_404(Participant, id=participant_id)
     event = participant.event
-    
+
     if request.method == "POST":
-        from .forms import GiftForm 
         form = GiftForm(request.POST)
         if form.is_valid():
             gift = form.save(commit=False)
             gift.participant = participant
 
+            # Check for posted edited fields first
             posted_name = request.POST.get("product_name")
             posted_price = request.POST.get("product_price")
             posted_image = request.POST.get("product_image")
 
             if posted_name or posted_price or posted_image:
+                # Only set them if present (allows empty strings)
                 if posted_name is not None:
                     gift.product_name = posted_name
                 if posted_price is not None:
                     gift.product_price = posted_price
                 if posted_image is not None:
-                    gift.product_image = posted_image     
+                    gift.product_image = posted_image
             else:
-                # Scrape product info from URL
+                # Fallback: scrape product info
                 product_data = scrape_product(gift.item_url)
                 if product_data:
                     gift.product_name = product_data.get("name") or ""
@@ -316,13 +351,34 @@ def add_gift(request, participant_id):
 
             gift.save()
             return redirect(f"{reverse('view_event', args=[event.id])}?tab=tab-{participant.id}")
+
     else:
-        from .forms import GiftForm
         form = GiftForm()
 
     html = render_to_string("partials/gift_form.html", {"form": form, "participant": participant}, request=request)
     return HttpResponse(html)
 
+
+def edit_gift(request, gift_id):
+    gift = get_object_or_404(Gift, id=gift_id)
+    participant = gift.participant
+    event = participant.event
+
+    if request.method == "POST":
+        # Directly update the fields you care about
+        gift.product_name = request.POST.get("product_name", gift.product_name)
+        gift.product_price = request.POST.get("product_price", gift.product_price)
+        gift.product_image = request.POST.get("product_image", gift.product_image)
+        gift.save()
+
+        return redirect(f"{reverse('view_event', args=[event.id])}?tab=tab-{participant.id}")
+
+    html = render_to_string(
+        "partials/gift_form.html",
+        {"gift": gift, "edit_mode": True},
+        request=request
+    )
+    return HttpResponse(html)
 
 
 
