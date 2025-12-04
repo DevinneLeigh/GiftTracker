@@ -35,21 +35,21 @@
       <h5 class="mb-0">
         <span class="">Remaining: ${{ p.remaining|floatformat:2 }}</span>
       </h5> {% endif %}
-      <!-- Dropdown for Edit/Delete -->
-      <div class="dropdown">
-        <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"> ... </button>
-        <ul class="dropdown-menu">
-            <li>
-            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Participant', `{% url 'edit_participant' p.id %}`)"> Edit </button>
-            </li>
-          <li>
-            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/participant/{{ p.id }}/delete/', 'participant')"> Delete </button>
-          </li>
-        </ul>
-      </div>
     </div> {% if p.gift_set.all %} 
     <ul class="gift-list"> {% for gift in p.gift_set.all %} 
       <li class="gift">
+                        <!-- Dropdown for Edit/Delete -->
+        <div class="dropdown">
+          <button class="btn dropdown-toggle dots" type="button" data-bs-toggle="dropdown"> ... </button>
+          <ul class="dropdown-menu">
+              <li>
+              <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Participant', `{% url 'edit_participant' p.id %}`)"> Edit </button>
+              </li>
+            <li>
+              <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/participant/{{ p.id }}/delete/', 'participant')"> Delete </button>
+            </li>
+          </ul>
+        </div>
         <div class="gift-box"> {% if gift.product_image %} 
           <div>
             <img src="{{ gift.product_image }}" alt="{{ gift.product_name }}"> {% endif %} 

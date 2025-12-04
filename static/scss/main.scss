@@ -87,6 +87,26 @@ h1, h2, h3, h4, h5, p, a, button{
     background-image: linear-gradient(to bottom, $purple2, $purple);
 }
 
+.small-card{
+    background-image: linear-gradient(to bottom, $g6, $g5);
+    color: $w;
+    border-radius: 10px;
+    border: none;
+    margin-top: 10px;
+}
+
+.add-item{
+    font-size: 24px;
+    padding: 40px 60px;
+}
+
+.add-item:hover{
+    background-image: linear-gradient(to bottom, $g5, $g6);
+    transform: scale(1.01);
+    transition: 0.2s;
+}
+
+
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -224,7 +244,6 @@ h3 {
             .event{
                 border-radius: 10px;
                 border: none;
-                border-radius: 10px;
                 background: $g4;
                 padding: 5px 5px 30px 5px;
                 .button-wrapper{
@@ -263,25 +282,13 @@ h3 {
     flex-flow: wrap;
     justify-content: center;
     align-items: center;
-    //gap: 10px;
     gap: 8px;
     text-align: center;
-    .dots{
-        margin-top: -10px;
-        margin-right: 3px;
-        @include md { // 768px
-            margin-right: 6px;
-        }
-    }
-    .add-participant{
-        border: none;
-        border-radius: 10px;
-        margin-top: 10px;
-        //background: $g6;
-        background-image: linear-gradient(to bottom, $g6, $g5);
+    .participant{
         width: 105px;
         height: 84px;
-        font-size: 30px;
+        padding: 0 2px 12.2px 2px;
+        margin-top: 10px;
         @include sm { // 576px
             width: 130px;
             height: 88.2px;
@@ -289,33 +296,7 @@ h3 {
         @include md { // 768px
             width: 135px;
             height: 99px;
-        }
-    }
-    .participant{
-        //height: 92.6px;
-        width: 105px;
-        padding: 0 2px 12.2px 2px;
-        //padding: 0 15px 15px 15px;
-        //background: $g6;
-        background-image: linear-gradient(to bottom, $g6, $g5);
-        color: $w;
-        border-radius: 10px;
-        margin-top: 10px;
-        @include sm { // 576px
-            width: 130px;
-        }
-        @include md { // 768px
-            width: 135px;
             padding: 0 2px 18.8px 2px;
-        }
-        @include lg { // 960px
-
-        }
-        @include xl { // 1200px
-
-        }
-        @include xxl { // 1400px
-
         }
         h4{
             font-size: 14px;
@@ -345,6 +326,11 @@ h3 {
 
 .dots{
     color: #A7A8A3;
+    margin-top: -10px;
+    margin-right: 3px;
+    @include md { // 768px
+        margin-right: 6px;
+    }
 }
 
 .people-list{
@@ -353,12 +339,9 @@ h3 {
     justify-content: center;
     gap: 15px;
     .people{
-        border: none;
         width: 270px;
-        //background: $g6;
-        background-image: linear-gradient(to bottom, $g6, $g5);
-        border-radius: 10px;
         padding-bottom: 30px;
+        list-style: none;
     }
 }
 
@@ -440,6 +423,7 @@ h5{
             flex-flow: row;
             align-items: center;
             gap: 15px;
+            margin-top: -20px;
             img{
                 width: 150px;
             }

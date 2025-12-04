@@ -3,11 +3,10 @@
 <div class="home-content">
   <div class="home-left">
     <h3 class="fw-bold mb-3">Celebrations</h3>
-
-
-    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Event', `{% url 'add_event' %}`)">Add New Event</button> {% if events %} <ul class="list-group event_list"> {% for e in events %} <li class="list-group-item event">
+    {% if events %} 
+    <ul class="list-group event_list"> {% for e in events %} <li class="list-group-item event">
         <div class="dropdown">
-          <button class="btn dropdown-toggle dots" type="button" data-bs-toggle="dropdown">&#9662;</button>
+          <button class="btn dropdown-toggle dots" type="button" data-bs-toggle="dropdown">...</button>
           <ul class="dropdown-menu">
             <li>
               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Event', `{% url 'edit_event' e.id %}`, 'Save Changes')"> Edit</button>
@@ -21,9 +20,10 @@
           <h3>{{ e.event }}</h3>
         </div> {% if participants  %} 
         <div class="participants">
-          <button class="add-participant" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Participant', `{% url 'add_participant' e.id %}`, 'Add')"> +</button> {% for p in e.participants_with_totals %} <div class="participant">
+          {% for p in e.participants_with_totals %} 
+          <div class="participant small-card">
             <div class="dropdown">
-              <button class="btn dropdown-toggle dots" type="button" data-bs-toggle="dropdown">&#9662;</button>
+              <button class="btn dropdown-toggle dots" type="button" data-bs-toggle="dropdown">...</button>
               <ul class="dropdown-menu">
                 <li>
                   <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Participant', `{% url 'edit_participant' p.id %}`)">Edit</button>
@@ -37,19 +37,33 @@
               <h4>{{ p.recipient.name }}</h4>
               <p class="mb-0 w2">{% if p.remaining >= 0 %}${{ p.remaining|floatformat:2 }} left in budget{% else %}-${{ p.remaining|floatformat:2|cut:"-" }} over budget{% endif %}</p>
             </div>
-          </div> {% endfor %}
-        </div> {% endif %}
+          </div> {% endfor %} {% endif %}
+            <button class="small-card participant add-item list-group-item" style="font-size: 30px; border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add Participant', `{% url 'add_participant' e.id %}`, 'Add')"> +</button> 
+        </div>
         <div class="button-wrapper">
           <a href="{% url 'view_event' e.id %}" class="button purple-button">View Celebration</a>
         </div>
-      </li> {% endfor %} </ul> {% endif %}
+      </li> {% endfor %} {% endif %}
+      {% if events %} 
+
+        <div class="participants event">
+              <button type="button" class="small-card add-item list-group-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Event', `{% url 'add_event' %}`)">New Event +</button>
+        </div> 
+
+    </ul>
+    {% else %}
+      <div class="d-flex ">
+            <button type="button" class="green-button" style="font-size:20px; margin: 20px auto; width:40%;" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Celebration', `{% url 'add_event' %}`)">Add New Event +</button> 
+      </div>
+    {% endif %}
   </div>
   <div class="home-right">
     <h3 class="fw-bold mb-3">Wish Lists</h3>
-    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Recipient', `{% url 'add_recipient' %}`, 'Add Recipient')">Add Person</button> {% if recipients %} <div class="background">
-      <ul class="list-group mb-3 people-list"> {% for r in recipients %} <li class="list-group-item people">
+    {% if recipients %} <div class="background">
+      <ul class="list-group mb-3 people-list"> {% for r in recipients %} 
+        <li class="list-group-item people small-card">
           <div class="dropdown">
-            <button class="btn dropdown-toggle dots" type="button" data-bs-toggle="dropdown">&#9662;</button>
+            <button class="btn dropdown-toggle dots" type="button" data-bs-toggle="dropdown">...</button>
             <ul class="dropdown-menu">
               <li>
                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Edit Recipient', `{% url 'edit_recipient' r.id%}`, 'Save Changes')">Edit</button>
@@ -72,7 +86,15 @@
           <div class="wish-list-button-group">
             <a class="green-button button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="giftModal('Add Item to {{ r.name }}\'s Wish List', `{% url 'add_wish_list' r.id %}`, 'Add Item')">Create new wish list +</a>
           </div> {% endif %}
-        </li> {% endfor %} </ul>
-    </div> {% endif %}
+        </li> {% endfor %}{% endif %}
+        {% if recipients %}
+        <button class="list-group-item people add-item small-card" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Recipient', `{% url 'add_recipient' %}`, 'Add Recipient')">Add Person +</button> 
+       </ul>
+    </div>
+    {% else %}
+    <div class="d-flex">
+      <button class="green-button" style="font-size:20px; margin: 20px auto; width:90%;" data-bs-toggle="modal" data-bs-target="#addModal" onclick="openModal('Add New Recipient', `{% url 'add_recipient' %}`, 'Add Recipient')">Add Person +</button>
+      {% endif %}
+    </div>
   </div>
 </div> {% endblock %}
