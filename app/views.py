@@ -18,9 +18,9 @@ EVENT_IMAGES = {
     "graduation": "graduation.png",
 }
 
-def user():
-    user = get_default_user()
-    return user
+
+user = get_default_user()
+
 
 
 def index(request):
@@ -65,7 +65,6 @@ def index(request):
 
 # Events
 def add_event(request):
-    user = get_default_user()
     if request.method == "POST":
         form = EventForm(request.POST)
         if form.is_valid():
@@ -79,7 +78,6 @@ def add_event(request):
     return HttpResponse(html)
 
 def edit_event(request, id):
-    user = get_default_user()
     event = get_object_or_404(Event, id=id, user=user)
     if request.method == "POST":
         form = EventForm(request.POST, instance=event)
@@ -92,14 +90,12 @@ def edit_event(request, id):
     return HttpResponse(html)
 
 def delete_event(request, id):
-    user = get_default_user()
     event = get_object_or_404(Event, id=id, user=user)
     if request.method == "POST":
         event.delete()
     return redirect(request.META.get("HTTP_REFERER", "index"))
 
 def view_event(request, id):
-    user = get_default_user()
     event = get_object_or_404(Event, id=id, user=user)
     participants = event.participant_set.select_related("recipient").prefetch_related('gift_set').all()
     participants = compute_totals(participants)
@@ -117,7 +113,6 @@ def view_event(request, id):
 
 # Recipients
 def add_recipient(request):
-    user = get_default_user()
     if request.method == "POST":
         form = RecipientForm(request.POST)
         if form.is_valid():
@@ -131,7 +126,6 @@ def add_recipient(request):
     return HttpResponse(html)
 
 def edit_recipient(request, id):
-    user = get_default_user()
     recipient = get_object_or_404(Recipient, id=id, user=user)
     if request.method == "POST":
         form = RecipientForm(request.POST, instance=recipient)
@@ -144,7 +138,6 @@ def edit_recipient(request, id):
     return HttpResponse(html)
 
 def delete_recipient(request, id):
-    user = get_default_user()
     recipient = get_object_or_404(Recipient, id=id, user=user)
     if request.method == "POST": 
         recipient.delete()
@@ -156,7 +149,6 @@ def delete_recipient(request, id):
 
 # Participants
 def add_participant(request, event_id):
-    user = get_default_user()
     event = get_object_or_404(Event, id=event_id, user=user)
     participant = None 
 
@@ -216,7 +208,6 @@ def edit_participant(request, participant_id):
 
 
 def delete_participant(request, id):
-    user = get_default_user()
     participant = get_object_or_404(Participant, id=id, event__user=user)
     if request.method == "POST": 
         participant.delete()
@@ -225,7 +216,6 @@ def delete_participant(request, id):
 
 
 def add_wish_list(request, recipient_id):
-    user = get_default_user()
     recipient = get_object_or_404(Recipient, id=recipient_id, user=user)
 
     if request.method == "POST":
@@ -312,7 +302,6 @@ def view_wish_list(request, wishlist_id, name):
 
 
 def delete_wish_list(request, id):
-    user = get_default_user()
     item = get_object_or_404(WishList, id=id, recipient__user=user)
     if request.method == "POST":
         item.delete()
@@ -320,7 +309,6 @@ def delete_wish_list(request, id):
 
 
 def bulk_delete_wish_list(request):
-    user = get_default_user()
     if request.method == "POST":
         ids = request.POST.get("ids", "")
         id_list = [int(x) for x in ids.split(",") if x.isdigit()]
