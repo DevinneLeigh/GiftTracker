@@ -11,6 +11,13 @@ from .models import Recipient, Event, Participant, Gift, Budget, WishList
 from .utils import *
 from .scraper import Scraper
 
+EVENT_IMAGES = {
+    "birthday": "birthday.png",
+    "wedding": "wedding.png",
+    "christmas": "christmas.png",
+    "graduation": "graduation.png",
+}
+
 def user():
     user = get_default_user()
     return user
@@ -442,4 +449,19 @@ def scrape_product_ajax(request):
         "name": product_data.get("name") or "",
         "price": price,
         "image": product_data.get("image") or ""
+    })
+
+
+def event_styles(request, id):
+    event = get_object_or_404(Event, id=id)
+
+    event_image = None
+    for key, img in EVENT_IMAGES.items():
+        if key in event.event.lower():
+            event_image = img
+            break
+
+    return render(request, "event.html", {
+        "event": event,
+        "event_image": event_image,
     })
