@@ -43,10 +43,8 @@ urlpatterns = [
     #Gifts
     path("participant/<int:participant_id>/add-gift/", views.add_gift, name="add_gift"),
     path("participant/<int:gift_id>/edit-gift", views.edit_gift, name="edit_gift"),
+    path("gift/<int:id>/delete/", views.delete_gift, name="delete_gift"),
 
-
-    path('recipient/<int:recipient_id>/add_wish_list/', views.add_wish_list, name='add_wish_list'),
-    path('participant/<int:participant_id>/add-gift/', views.add_gift, name='add_gift'),
 
     # new shared AJAX endpoint for scraping
     path('scrape-product/', views.scrape_product_ajax, name='scrape_product_ajax'),

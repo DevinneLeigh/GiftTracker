@@ -46,7 +46,7 @@
               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addModal" onclick="editGiftModal('Edit Gift', `{% url 'edit_gift' gift.id %}`)"> Edit </button>
               </li>
             <li>
-              <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal('/participant/{{ p.id }}/delete/', 'participant')"> Delete </button>
+              <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="openDeleteModal(`{% url 'delete_gift' gift.id %}`, 'gift')"> Delete </button>
             </li>
           </ul>
         </div>

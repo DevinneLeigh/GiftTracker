@@ -37,7 +37,7 @@
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="recipientDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Wish Lists </a>
                   <ul class="dropdown-menu" aria-labelledby="recipientDropdown"> {% for r in all_recipients %} {% with w=r.wishlist.first %} {% if w %} <li>
-                      <a class="dropdown-item" href="{% url 'view_wish_list' w.id r.name %}">
+                      <a class="dropdown-item" href="{% url 'view_wish_list' r.id r.name %}">
                         {{ r.name }}
                       </a>
                     </li> {% endif %} {% endwith %} {% empty %} <li>

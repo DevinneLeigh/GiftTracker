@@ -11,6 +11,11 @@ from .models import Recipient, Event, Participant, Gift, Budget, WishList
 from .utils import *
 from .scraper import Scraper
 
+def user():
+    user = get_default_user()
+    return user
+
+
 def index(request):
     recipients = Recipient.objects.all()
     events = Event.objects.prefetch_related(
@@ -380,6 +385,13 @@ def edit_gift(request, gift_id):
         request=request
     )
     return HttpResponse(html)
+
+def delete_gift(request, id):
+    item = get_object_or_404(Gift, id=id)
+    if request.method == "POST":
+        item.delete()
+    return redirect(request.META.get("HTTP_REFERER", "index"))
+
 
 
 
