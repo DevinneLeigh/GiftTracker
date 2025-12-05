@@ -20,7 +20,12 @@ pip install requests beautifulsoup4
 
 Run development server
 ```bash
+# Enter venv if you haven't.
+source /home/student/mysite/venv/bin/activate
+# run the app
 python manage.py runserver 0.0.0.0:8000
+# or 
+npm run serve
 ```
 Then go to: 
 http://172.22.210.37:8000/

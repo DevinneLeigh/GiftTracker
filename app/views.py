@@ -8,7 +8,8 @@ from django.db.models import Q, Prefetch
 from decimal import Decimal
 from .forms import TemplateFormMixin, RecipientForm, EventForm, WishListForm, ParticipantForm, GiftForm 
 from .models import Recipient, Event, Participant, Gift, Budget, WishList
-from .utils import get_default_user, compute_totals, scrape_product
+from .utils import *
+from .scraper import Scraper
 
 def index(request):
     recipients = Recipient.objects.all()
@@ -233,7 +234,7 @@ def add_wish_list(request, recipient_id):
                 if posted_image is not None:
                     item.product_image = posted_image
             else:
-                product_data = scrape_product(item.item_url)
+                product_data = Scraper(item.item_url).scrape_product()
                 if product_data:
                     item.product_name = product_data.get("name") or ""
                     item.product_image = product_data.get("image") or ""
@@ -343,7 +344,7 @@ def add_gift(request, participant_id):
                     gift.product_image = posted_image
             else:
                 # Fallback: scrape product info
-                product_data = scrape_product(gift.item_url)
+                product_data = Scraper(gift.item_url).scrape_product()
                 if product_data:
                     gift.product_name = product_data.get("name") or ""
                     gift.product_image = product_data.get("image") or ""
@@ -415,7 +416,7 @@ def scrape_product_ajax(request):
     if not url:
         return JsonResponse({"error": "No URL provided."}, status=400)
 
-    product_data = scrape_product(url)
+    product_data = Scraper(url).scrape_product()
     if not product_data:
         return JsonResponse({"error": "Could not extract product info."}, status=404)
 
