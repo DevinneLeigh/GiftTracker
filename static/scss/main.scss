@@ -114,13 +114,22 @@ h1, h2, h3, h4, h5, p, a, button{
 }
 
 body{
-    //background: $g3;
-    background-image: linear-gradient(to bottom right, $g2, $g6);
+    //background: linear-gradient(to bottom right, $g2, $g6);
+    background: linear-gradient(180deg, $g2 0%, $g6 100%);
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+}
+
+main{
+    margin-top: 56px;
 }
 
 .page-content{
     max-width: 1400px;
-    margin: 20px auto;
+    margin: auto;
+    padding: 50px 0;
 }
 
 .dropdown-toggle::after {
@@ -416,7 +425,6 @@ h5{
         padding: 20px;
         border-radius: 10px;
         border: none;
-        height: 190px;
         .gift-box{
             height: 100%;
             display: flex;
