@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -18,14 +19,14 @@ EVENT_IMAGES = {
     "graduation": "graduation.png",
 }
 
+def landing(request):
+	return render(request, "landing.html")
 
-user = get_default_user()
-
-
-
+@login_required(login_url='/landing/')
 def index(request):
-    recipients = Recipient.objects.all()
-    events = Event.objects.prefetch_related(
+    user = request.user
+    recipients = Recipient.objects.filter(user=user)
+    events = Event.objects.filter(user=user).prefetch_related(
         Prefetch(
             'participant_set',
             queryset=compute_totals(
@@ -42,7 +43,7 @@ def index(request):
     participants = Participant.objects.select_related('recipient', 'event').all()
 
 
-    wishlists = WishList.objects.all()
+    wishlists = WishList.objects.filter(recipient__in=recipients)
     recipient_form = RecipientForm()
     event_form = EventForm()
     event_edit_forms = {e.id: EventForm(instance=e) for e in events}
@@ -64,7 +65,9 @@ def index(request):
 
 
 # Events
+@login_required(login_url='/landing/')
 def add_event(request):
+    user = request.user
     if request.method == "POST":
         form = EventForm(request.POST)
         if form.is_valid():
@@ -77,7 +80,9 @@ def add_event(request):
     html = render_to_string("partials/event_form.html", {"form": form}, request=request)
     return HttpResponse(html)
 
+@login_required(login_url='/landing/')
 def edit_event(request, id):
+    user = request.user
     event = get_object_or_404(Event, id=id, user=user)
     if request.method == "POST":
         form = EventForm(request.POST, instance=event)
@@ -89,13 +94,17 @@ def edit_event(request, id):
     html = render_to_string("partials/event_form.html", {"form": form}, request=request)
     return HttpResponse(html)
 
+@login_required(login_url='/landing/')
 def delete_event(request, id):
+    user = request.user
     event = get_object_or_404(Event, id=id, user=user)
     if request.method == "POST":
         event.delete()
     return redirect(request.META.get("HTTP_REFERER", "index"))
 
+@login_required(login_url='/landing/')
 def view_event(request, id):
+    user = request.user
     event = get_object_or_404(Event, id=id, user=user)
     participants = event.participant_set.select_related("recipient").prefetch_related('gift_set').all()
     participants = compute_totals(participants)
@@ -112,7 +121,9 @@ def view_event(request, id):
 
 
 # Recipients
+@login_required(login_url='/landing/')
 def add_recipient(request):
+    user = request.user
     if request.method == "POST":
         form = RecipientForm(request.POST)
         if form.is_valid():
@@ -125,7 +136,9 @@ def add_recipient(request):
     html = render_to_string("partials/recipient_form.html", {"form": form}, request=request)
     return HttpResponse(html)
 
+@login_required(login_url='/landing/')
 def edit_recipient(request, id):
+    user = request.user
     recipient = get_object_or_404(Recipient, id=id, user=user)
     if request.method == "POST":
         form = RecipientForm(request.POST, instance=recipient)
@@ -137,7 +150,9 @@ def edit_recipient(request, id):
     html = render_to_string("partials/recipient_form.html", {"form": form}, request=request)
     return HttpResponse(html)
 
+@login_required(login_url='/landing/')
 def delete_recipient(request, id):
+    user = request.user
     recipient = get_object_or_404(Recipient, id=id, user=user)
     if request.method == "POST": 
         recipient.delete()
@@ -148,15 +163,16 @@ def delete_recipient(request, id):
 
 
 # Participants
+@login_required(login_url='/landing/')
 def add_participant(request, event_id):
+    user = request.user
     event = get_object_or_404(Event, id=event_id, user=user)
     participant = None 
 
     referer = request.META.get("HTTP_REFERER", "")
 
     if request.method == "POST":
-        form = ParticipantForm(request.POST)
-        form.fields['recipient'].queryset = Recipient.objects.exclude(participant__event=event)
+        form = ParticipantForm(request.POST, user=user, event=event)
 
         if form.is_valid():
             participant = form.save(commit=False)
@@ -170,25 +186,22 @@ def add_participant(request, event_id):
             return redirect(referer or reverse("index"))
 
     else:
-        form = ParticipantForm()
-        form.fields['recipient'].queryset = Recipient.objects.exclude(
-            participant__event=event
-        )
+        form = ParticipantForm(user=user, event=event)
 
     html = render_to_string(
         "partials/participant_form.html",
-        {"form": form, "participant": participant, "event": Event.objects.all()},
+        {"form": form, "participant": participant, "event": Event.objects.filter(user=user)},
         request=request
     )
     return HttpResponse(html)
 
-
+@login_required(login_url='/landing/')
 def edit_participant(request, participant_id):
+    user = request.user
     participant = get_object_or_404(Participant, id=participant_id)
     event = participant.event
     if request.method == "POST":
-        form = ParticipantForm(request.POST, instance=participant)
-        form.fields['recipient'].queryset = Recipient.objects.exclude(participant__event=event) | Recipient.objects.filter(id=participant.recipient.id)
+        form = ParticipantForm(request.POST, instance=participant, user=user, event=event)
         
         if form.is_valid():
             participant = form.save()
@@ -200,22 +213,23 @@ def edit_participant(request, participant_id):
             referer = request.META.get("HTTP_REFERER", "")
             return redirect(referer or reverse("index"))
     else:
-        form = ParticipantForm(instance=participant)
-        form.fields['recipient'].queryset = Recipient.objects.exclude(participant__event=event) | Recipient.objects.filter(id=participant.recipient.id)
+        form = ParticipantForm(instance=participant, user=user, event=event)
 
     html = render_to_string("partials/participant_form.html", {"form": form, "participant": participant}, request=request)
     return HttpResponse(html)
 
-
+@login_required(login_url='/landing/')
 def delete_participant(request, id):
+    user = request.user
     participant = get_object_or_404(Participant, id=id, event__user=user)
     if request.method == "POST": 
         participant.delete()
     referer = request.META.get("HTTP_REFERER", "")
     return redirect(referer or reverse("index"))
 
-
+@login_required(login_url='/landing/')
 def add_wish_list(request, recipient_id):
+    user = request.user
     recipient = get_object_or_404(Recipient, id=recipient_id, user=user)
 
     if request.method == "POST":
@@ -252,7 +266,7 @@ def add_wish_list(request, recipient_id):
     return HttpResponse(html)
 
 
-
+@login_required(login_url='/landing/')
 def edit_wish_list(request, wish_id):
     item = get_object_or_404(WishList, id=wish_id)
     recipient = item.recipient
@@ -287,6 +301,7 @@ def edit_wish_list(request, wish_id):
 #         'wishlist_items': wishlist_items,
 #     })
 
+@login_required(login_url='/landing/')
 def view_wish_list(request, wishlist_id, name):
     """
     wishlist_id is actually the recipient ID in your URLs. We'll get the recipient,
@@ -300,15 +315,17 @@ def view_wish_list(request, wishlist_id, name):
         'wishlist_items': wishlist_items,
     })
 
-
+@login_required(login_url='/landing/')
 def delete_wish_list(request, id):
+    user = request.user
     item = get_object_or_404(WishList, id=id, recipient__user=user)
     if request.method == "POST":
         item.delete()
     return redirect(request.META.get("HTTP_REFERER", "index"))
 
-
+@login_required(login_url='/landing/')
 def bulk_delete_wish_list(request):
+    user = request.user
     if request.method == "POST":
         ids = request.POST.get("ids", "")
         id_list = [int(x) for x in ids.split(",") if x.isdigit()]
@@ -318,7 +335,7 @@ def bulk_delete_wish_list(request):
         ).delete()
     return redirect(request.META.get("HTTP_REFERER", "index"))
 
-
+@login_required(login_url='/landing/')
 def add_gift(request, participant_id):
     participant = get_object_or_404(Participant, id=participant_id)
     event = participant.event
@@ -359,7 +376,7 @@ def add_gift(request, participant_id):
     html = render_to_string("partials/gift_form.html", {"form": form, "participant": participant}, request=request)
     return HttpResponse(html)
 
-
+@login_required(login_url='/landing/')
 def edit_gift(request, gift_id):
     gift = get_object_or_404(Gift, id=gift_id)
     participant = gift.participant
@@ -381,6 +398,7 @@ def edit_gift(request, gift_id):
     )
     return HttpResponse(html)
 
+@login_required(login_url='/landing/')
 def delete_gift(request, id):
     item = get_object_or_404(Gift, id=id)
     if request.method == "POST":
@@ -389,7 +407,7 @@ def delete_gift(request, id):
 
 
 
-
+@login_required(login_url='/landing/')
 @require_POST
 def move_wishlist_to_gifts(request, participant_id):
     participant = get_object_or_404(Participant, id=participant_id)
@@ -410,7 +428,7 @@ def move_wishlist_to_gifts(request, participant_id):
 
 
 
-
+@login_required(login_url='/landing/')
 @require_POST
 def scrape_product_ajax(request):
     """
@@ -439,7 +457,7 @@ def scrape_product_ajax(request):
         "image": product_data.get("image") or ""
     })
 
-
+@login_required(login_url='/landing/')
 def event_styles(request, id):
     event = get_object_or_404(Event, id=id)
 
@@ -453,3 +471,19 @@ def event_styles(request, id):
         "event": event,
         "event_image": event_image,
     })
+
+
+def register(request):
+    user = request.user
+    if user.is_authenticated:
+        return redirect('index')
+
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('user_login')
+    else:
+        form = UserCreationForm()
+
+    return render(request, "auth/register.html", {"form": form})

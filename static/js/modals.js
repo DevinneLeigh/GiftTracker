@@ -327,28 +327,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Run once on page load
-    updateCheckboxVisibility();
+    if (toggle) {
+        // Run once on page load
+        updateCheckboxVisibility();
 
-    // Run whenever toggle changes
-    toggle.addEventListener("change", updateCheckboxVisibility);
+        // Run whenever toggle changes
+        toggle.addEventListener("change", updateCheckboxVisibility);
 
-        if (selectAll) {
-        selectAll.addEventListener("change", () => {
-            const checked = selectAll.checked;
-            boxes.forEach(cb => {
-                cb.checked = checked;
+            if (selectAll) {
+            selectAll.addEventListener("change", () => {
+                const checked = selectAll.checked;
+                boxes.forEach(cb => {
+                    cb.checked = checked;
+                });
+            });
+        }
+
+        boxes.forEach(cb => {
+            cb.addEventListener("change", () => {
+                if (!cb.checked && selectAll.checked) {
+                    selectAll.checked = false;
+                }
             });
         });
     }
-
-    boxes.forEach(cb => {
-    cb.addEventListener("change", () => {
-        if (!cb.checked && selectAll.checked) {
-            selectAll.checked = false;
-        }
-    });
-});
 });
 
 

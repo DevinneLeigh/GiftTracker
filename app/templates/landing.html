@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static %} 
+{% block content %} 
+
+	<div style="text-align: center; margin-top: 50px;">
+		<h1>Welcome to GiftTracker</h1>
+		<p>Your personal gift management application.</p>
+		<p><a href="{% url 'user_login' %}">Login</a> or <a href="{% url 'user_register' %}">Sign Up</a> to get started!</p>
+	</div>
+
+{% endblock %}

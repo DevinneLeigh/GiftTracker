@@ -449,3 +449,34 @@ h5{
     text-align: center;
 }
 
+[data-event-name-card*='poop'] {
+    background: #39210f !important;
+    .decorations {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    
+        .bottom-left-decoration {
+            position: relative;
+            bottom: 80px;
+            left: 1%;
+            width: 100px;
+            height: 100px;
+            background: red;
+        }
+    
+        .bottom-right-decoration {
+            position: relative;
+            bottom: 80px;
+            right: 1%;
+            width: 100px;
+            height: 100px;
+            background: green;
+        }
+    }
+}
+
+[data-event-name-page*='poop'] {
+    background: linear-gradient(#563114, #291607) !important;
+}

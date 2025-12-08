@@ -35,7 +35,7 @@
       </div>
    </div> -->
    <div class="d-flex justify-content-between align-items-center mb-3">
-      <button class="green-button button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="giftModal('Add Item to {{ recipient.name }}\'s Wish List', `{% url 'add_wish_list' recipient.id %}`, 'Add Item')">Add Item +</button>
+      <button class="green-button button" data-bs-toggle="modal" data-bs-target="#addModal" onclick="giftModal('Add Item to {{ recipient.name|escapejs }}\'s Wish List', `{% url 'add_wish_list' recipient.id %}`, 'Add Item')">Add Item +</button>
    </div>
    {% if wishlist_items %}
    <ul class="gift-list">
