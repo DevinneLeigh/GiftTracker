@@ -10,10 +10,31 @@ class Scraper:
 
 
         self.common_headers = {
-            "User-Agent": "Mozilla/5.0",
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/121.0 Safari/537.36"
+            ),
+            "Accept": (
+                "text/html,application/xhtml+xml,application/xml;"
+                "q=0.9,image/avif,image/webp,*/*;q=0.8"
+            ),
             "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Connection": "keep-alive",
+            "Referer": "https://www.amazon.com/",
+            "DNT": "1",
+            "Upgrade-Insecure-Requests": "1",
         }
-
+        self.mobile_headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) "
+                "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 "
+                "Mobile/15E148 Safari/604.1"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
+		}
+        
         self.url = url
         self.soup = None
 
@@ -35,9 +56,20 @@ class Scraper:
     def shorten_name(cls, text: str) -> str | None:
         return text.split(",")[0]
     
+
     """
-        Extracts the naked TLD of a URL, e.g., 'amazon', 'walmart', 'target'.
-        Returns None if the domain is not recognized.
+    Debugging utility to write the current HTML to a file.
+    Good for figuring out if you are being sent to bot detection pages.
+    """
+    def write_html_to_file(self):
+        html_output = self.soup.prettify()
+        with open("page_dump.html", "w", encoding="utf-8") as f:
+            f.write(html_output)
+        print("HTML written to page_dump.html")
+    
+    """
+    Extracts the naked TLD of a URL, e.g., 'amazon', 'walmart', 'target'.
+    Returns None if the domain is not recognized.
     """
     def get_store(self) -> str | None:
         domain = urlparse(self.url).netloc.lower()
@@ -57,7 +89,7 @@ class Scraper:
     
 
     """
-        Try to extract JSON-LD data first (common for structured product info)
+    Try to extract JSON-LD data first (common for structured product info)
     """
     def get_structured_data_product(self):
         json_ld = self.soup.find("script", type="application/ld+json")
@@ -73,12 +105,7 @@ class Scraper:
                 price = None
                 if "offers" in data and isinstance(data["offers"], dict):
                     price = data["offers"].get("price")
-
-                if name and image and price:
-                    print("🫠🫠🫠🫠🫠🫠 WOWIE THIS WORKS?!")
-                
                 if name or image or price:
-                    print("😵‍💫 Well, almost. 😵‍💫")
                     self.set_product(name=name, image=image, price=price)
                     return {"name": name, "image": image, "price": price}
             except (json.JSONDecodeError, KeyError, TypeError):
@@ -97,8 +124,8 @@ class Scraper:
     
 
     """
-        Extracts the current_retail price from a Target script tag string.
-        Returns a float price, or None if not found.
+    Extracts the current_retail price from a Target script tag string.
+    Returns a float price, or None if not found.
     """
     def extract_target_price_from_script(self, script_text: str) -> float | None:
         match = re.search(r'\\"price\\":\{\\"current_retail\\":([\d\.]+)', script_text)
@@ -106,6 +133,7 @@ class Scraper:
             return float(match.group(1))
         return None
     
+
     def scrape_target(self):
 
         # Name should be good.
@@ -145,8 +173,8 @@ class Scraper:
         
     
     """
-        Extracts the first image URL from Amazon's 'data-a-dynamic-image' attribute
-        when it is HTML-encoded.
+    Extracts the first image URL from Amazon's 'data-a-dynamic-image' attribute
+    when it is HTML-encoded.
     """
     def extract_amazon_image_from_dynamic_image_attr(self, attr_value: str) -> str | None:
         if not attr_value:
@@ -164,30 +192,53 @@ class Scraper:
 
 
     def scrape_amazon(self):
-        price = None 
+        
+		# Should get name if not detected as a bot
+        
+        price_hidden_input = self.soup.find("input", id="twister-plus-price-data-price")
+        if price_hidden_input:
+            # get the value from the input element
+            self.set_product(price=price_hidden_input.get("value"))
+        else:
+            # Fallback to mobile amazon page.
+            self.scrape_amazon_mobile()
 
-        price_container = self.soup.find("span", id="tp_price_block_total_price_ww")
-        if price_container:
-            price_tag = price_container.find("span", class_="a-offscreen")
-            if price_tag:
-                price = price_tag.get_text(strip=True)
+        image_tag = self.soup.find(id="landingImage")
+        if (image_tag):
+            image_data = image_tag.get("data-a-dynamic-image")
+            image = self.extract_amazon_image_from_dynamic_image_attr(image_data)
+            if image:
+                self.set_product(image=image)
 
+
+    def scrape_amazon_mobile(self):
+        print("Falling back to mobile page scrape.")
+        mobile_url = self.url.replace("www.amazon.", "m.amazon.")
         try:
-            return {
-                "price": price,
-            }
-        except Exception as e:
-            print("Parsing error:", e)
+            response = requests.get(mobile_url, headers=self.mobile_headers, timeout=10)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            print("Request failed:", e)
             return None
+
+        mobile_soup = BeautifulSoup(response.text, "html.parser")
+
+        price_tag = mobile_soup.find("span", class_="aok-offscreen")
+        if price_tag:
+            price = price_tag.text.strip().replace("$", "")
+            if price:
+                self.set_product(price=price)
+            
+
         
     """
-        Takes a product/listing URL and returns a dictionary:
-        {
-            "name": ...,
-            "image": ...,
-            "price": ...
-        }
-        Returns None if scraping fails.
+    Takes a product/listing URL and returns a dictionary:
+    {
+        "name": ...,
+        "image": ...,
+        "price": ...
+    }
+    Returns None if scraping fails.
     """
     def scrape_product(self):
         
@@ -207,40 +258,18 @@ class Scraper:
         # 2. Fallback: scrape HTML manually
         self.generalized_scrape_attempt()
 
-        print("Before getting specific, we found: ")
-        print(self.product)
-
         # Customized methods for complex popular sites.
         store = self.get_store()
         if (store == "target"):
             self.scrape_target()
         elif (store == "walmart"):
-            product = self.scrape_walmart()
-            name = product.get('name')
-            name = self.shorten_name(name)
-            price = product.get('price')
-            image = product.get('image')
+            self.scrape_walmart()
         elif (store == 'amazon'):
-            product = self.scrape_amazon()
-            if (product):
-                price = product.get('price')
-            if (price):
-                price = price.replace("$", "")
-            name_tag = self.soup.find(id="productTitle")
-            if (name_tag):
-                name = name_tag.text.strip()
-            image_tag = self.soup.find(id="landingImage")
-            if (image_tag):
-                image_data = image_tag.get("data-a-dynamic-image")
-                image = self.extract_amazon_image_from_dynamic_image_attr(image_data)
-        else:
-            price_tag = self.soup.find(class_="price") or self.soup.find("span", {"id": "price"})
-            price = price_tag.text.strip() if price_tag else None
+            self.scrape_amazon()
 
         if not any(self.product.values()):
             return None  # nothing found
         
-        print("After getting specific, we found: ")
-        print(self.product)
+        # print(self.product)
 
         return self.product
