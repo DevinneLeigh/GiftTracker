@@ -1,0 +1,16 @@
+{% comment %} Used for Add/Edit Participant {% endcomment %}
+{% csrf_token %}
+
+<p>{{ participant.recipient.name }}</p>
+
+<div class="mb-3">
+    <label for="budget" class="form-label">Budget</label>
+    <input type="number" step="10" min="0" name="budget" class="form-control"
+        {% if participant and participant.budget %}
+            value="{{ participant.budget.price }}"
+        {% endif %}
+    >
+</div>
+
+
+
