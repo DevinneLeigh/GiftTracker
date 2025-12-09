@@ -21,42 +21,52 @@
                   <a class="nav-link" href="/">Home</a>
                 </li>
               </div>
-              <div>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="eventDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Celebrations </a>
-                  <ul class="dropdown-menu" aria-labelledby="eventDropdown"> {% for e in all_events %} <li>
-                      <a class="dropdown-item" href="/event/{{ e.id }}/">
-                        {{ e.event }}
-                      </a>
-                    </li> {% empty %} <li>
-                      <span class="dropdown-item-text text-muted">(none)</span>
-                    </li> {% endfor %} </ul>
-                </li>
-              </div>
-              <div>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="recipientDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Wish Lists </a>
-                  <ul class="dropdown-menu" aria-labelledby="recipientDropdown"> {% for r in all_recipients %} {% with w=r.wishlist.first %} {% if w %} <li>
-                      <a class="dropdown-item" href="{% url 'view_wish_list' r.id r.name %}">
-                        {{ r.name }}
-                      </a>
-                    </li> {% endif %} {% endwith %} {% empty %} <li>
-                      <span class="dropdown-item-text text-muted">No recipients</span>
-                    </li> {% endfor %} </ul>
-                </li>
-              </div>
+              {% if user.is_authenticated %}
+                <div>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="eventDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Celebrations </a>
+                    <ul class="dropdown-menu" aria-labelledby="eventDropdown"> {% for e in all_events %} <li>
+                        <a class="dropdown-item" href="/event/{{ e.id }}/">
+                          {{ e.event }}
+                        </a>
+                      </li> {% empty %} <li>
+                        <span class="dropdown-item-text text-muted">(none)</span>
+                      </li> {% endfor %} </ul>
+                  </li>
+                </div>
+                <div>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="recipientDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Wish Lists </a>
+                    <ul class="dropdown-menu" aria-labelledby="recipientDropdown"> {% for r in all_recipients %} {% with w=r.wishlist.first %} {% if w %} <li>
+                        <a class="dropdown-item" href="{% url 'view_wish_list' r.id r.name %}">
+                          {{ r.name }}
+                        </a>
+                      </li> {% endif %} {% endwith %} {% empty %} <li>
+                        <span class="dropdown-item-text text-muted">No recipients</span>
+                      </li> {% endfor %} </ul>
+                  </li>
+                </div>
+              {% endif %}
             </ul>
             <!-- Right side -->
-            <div class="d-flex">
-              <a href="/login" class="btn btn-outline-light me-2">Login</a>
-              <a href="/register" class="btn btn-warning">Sign Up</a>
+            <div class="d-flex align-items-center">
+              {% if user.is_authenticated %}
+                <p style="margin-bottom: 0; margin-right: 15px; padding-top: 8px;">Welcome, {{ user.username }}!</p>
+                <form method="post" action="{% url 'user_logout' %}">
+                  {% csrf_token %}
+                  <button class="purple-button px-4 py-2 me-2 mt-0" type="submit">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'user_login' %}" class="green-button px-3 py-2 me-2">Login</a>
+                <a href="{% url 'user_register' %}" class="purple-button py-2 px-4">Sign Up</a>
+              {% endif %}
             </div>
           </div>
         </div>
       </nav>
     </header>
     <main>
-      <div class="page-content"> {% block content %}
+      <div> {% block content %}
         <!-- Page-specific content will go here --> {% endblock %}
       </div>
     </main>

@@ -48,8 +48,12 @@ class ParticipantForm(forms.ModelForm):
         fields = ["recipient", "budget"]
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        event = kwargs.pop("event", None)
         super().__init__(*args, **kwargs)
         # Pre-fill budget if it exists
         if self.instance and hasattr(self.instance, 'budget'):
             self.fields['budget'].initial = self.instance.budget.price
+        if user and event:
+            self.fields["recipient"].queryset = Recipient.objects.filter(user=user).exclude(participant__event=event)
 

@@ -50,6 +50,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+LOGIN_URL = "/login/" # default used by redirect helpers
+LOGIN_REDIRECT_URL = "/"       # where to go after login
+LOGOUT_REDIRECT_URL = "/"      # where to go after logout
+
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [
