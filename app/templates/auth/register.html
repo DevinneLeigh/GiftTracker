@@ -3,10 +3,14 @@
 {% block content %}
 <div class="page-content p-4 row">
 <h2>Register</h2>
-    <form method="post" class="col-lg-6 col-sm-8 col-xs-10 mx-auto">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="green-button w-100" type="submit">Sign Up</button>
+    <form method="post" class="d-flex flex-column align-items-center">
+        <div>
+            {% csrf_token %}
+            {{ form.as_p }}
+        </div>
+        <div>
+            <button class="purple-button px-5" type="submit">Sign Up</button>
+        </div>
     </form>
 </div>
 {% endblock %}

@@ -49,16 +49,16 @@
               {% endif %}
             </ul>
             <!-- Right side -->
-            <div class="d-flex">
+            <div class="d-flex align-items-center">
               {% if user.is_authenticated %}
                 <p style="margin-bottom: 0; margin-right: 15px; padding-top: 8px;">Welcome, {{ user.username }}!</p>
                 <form method="post" action="{% url 'user_logout' %}">
                   {% csrf_token %}
-                  <button class="btn btn-outline-light me-2" type="submit">Logout</button>
+                  <button class="purple-button px-4 py-2 me-2 mt-0" type="submit">Logout</button>
                 </form>
               {% else %}
-                <a href="{% url 'user_login' %}" class="btn btn-outline-light me-2">Login</a>
-                <a href="{% url 'user_register' %}" class="btn btn-warning">Sign Up</a>
+                <a href="{% url 'user_login' %}" class="green-button px-3 py-2 me-2">Login</a>
+                <a href="{% url 'user_register' %}" class="purple-button py-2 px-4">Sign Up</a>
               {% endif %}
             </div>
           </div>
