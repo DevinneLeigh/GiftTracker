@@ -1,134 +1,139 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div data-event-name-page="{{ event.event|lower }}">
-		<h2>{{ event.event }}</h2>
-		<hr>
-		{% if participants %}
-				<!-- Tabs Nav -->
-				<ul class="nav" id="participantTabs" role="tablist">
-						{% for p in participants %}
-								<li class="nav-item" role="presentation">
-										<button class=" nav-link {% if active_tab == 'tab-'|add:p.id|stringformat:'s' %} active {% elif forloop.first and not active_tab %} active {% endif %}"
-														id="tab-{{ p.id }}"
-														data-bs-toggle="tab"
-														data-bs-target="#content-{{ p.id }}"
-														type="button"
-														role="tab"
-														href="#content-{{ p.id }}">{{ p.recipient.name }}</button>
-								</li>
-						{% endfor %}
-						<li class="nav-item">
-								<button class="nav-link add"
-												data-bs-toggle="modal"
-												data-bs-target="#addModal"
-												onclick="openModal('Add Participant', `{% url 'add_participant' event.id %}`)">New +</button>
-						</li>
-						<li class="hanging"></li>
-				</ul>
-				<!-- Tab Content -->
-				<div class="tab-content mt-3">
-						{% for p in participants %}
-								<div class="tab-pane fade {% if active_tab == 'tab-'|add:p.id|stringformat:'s' %} show active {% elif forloop.first and not active_tab %} show active {% endif %}"
-										 id="content-{{ p.id }}"
-										 role="tabpanel">
-										<div class="d-flex justify-content-between align-items-center mb-3">
-												<h5 class="mb-0">
-														{% if p.budget %}Budget: ${{ p.budget.price|floatformat:2 }}{% endif %}
-												</h5>
-												<h5 class="mb-0">
-														Total Spent: ${{ p.spent|floatformat:2 }}
-														{% if p.budget %}
-														</h5>
-														<h5 class="mb-0">
-																Money Left:
-																{% if p.remaining >= 0 %}
-																		${{ p.remaining|floatformat:2 }}
-																{% else %}
-																		-${{ p.remaining|floatformat:2|cut:"-" }}
-																{% endif %}
-														</h5>
-												{% endif %}
-												<button class="green-button"
-																data-bs-toggle="modal"
-																data-bs-target="#addModal"
-																onclick="giftModal('Add Gift for {{ p.recipient.name|escapejs }}', `{% url 'add_gift' p.id %}`)">
-														Add New Gift +
-												</button>
-												<button class="green-button"
-																data-bs-toggle="offcanvas"
-																data-bs-target="#wishlistOffcanvas{{ p.id }}"
-																aria-controls="wishlistOffcanvas">Add From Wish List +</button>
-										</div>
-										{% if p.gift_set.all %}
-												<ul class="gift-list">
-														{% for gift in p.gift_set.all %}
-																<li class="gift">
-																		<!-- Dropdown for Edit/Delete -->
-																		<div class="dropdown">
-																				<button class="btn dropdown-toggle dots"
-																								type="button"
-																								data-bs-toggle="dropdown">...</button>
-																				<ul class="dropdown-menu">
-																						<li>
-																								<button class="dropdown-item"
-																												data-bs-toggle="modal"
-																												data-bs-target="#addModal"
-																												onclick="editGiftModal('Edit Gift', `{% url 'edit_gift' gift.id %}`)">
-																										Edit
-																								</button>
-																						</li>
-																						<li>
-																								<button class="dropdown-item"
-																												data-bs-toggle="modal"
-																												data-bs-target="#deleteModal"
-																												onclick="openDeleteModal(`{% url 'delete_gift' gift.id %}`, 'gift')">
-																										Delete
-																								</button>
-																						</li>
-																				</ul>
-																		</div>
-																		<div class="gift-box">
-																				{% if gift.product_image %}
-																						<div>
-																								<img src="{{ gift.product_image }}" alt="{{ gift.product_name }}">
-																						{% endif %}
-																				</div>
-																				<div id="gift-info">
-																						{% if gift.product_name %}
-																								<div>
-																										<a href="{{ gift.item_url }}"
-																											 class="fw-semibold text-decoration-none"
-																											 target="_blank">{{ gift.product_name }}</a>
-																								</div>
-																						{% else %}
-																								<div>
-																										<a href="{{ gift.item_url }}"
-																											 class="fw-semibold text-decoration-none"
-																											 target="_blank">{{ gift.item_url }}</a>
-																								</div>
-																						{% endif %}
-																						{% if gift.product_price %}
-																								<div>
-																										<a>${{ gift.product_price }}</a>
-																								</div>
-																						{% endif %}
-																				</div>
-																				<input type="checkbox"
-																							 class="form-check-input delete-checkbox d-none"
-																							 value="{{ gift.id }}">
-																		</div>
-																</li>
-														{% endfor %}
-												</ul>
-										{% else %}
-												<p class="empty fst-italic">No gifts added yet.</p>
-										{% endif %}
-								</div>
-						{% endfor %}
-				</div>
-		{% else %}
-				<p>No participants yet.</p>
-		{% endif %}
+	<div class="event-page" data-event-name-page="{{ event.event|lower }}">
+		<div class="event-title-wrapper">
+			<div class="title-decoration"></div>
+		</div>
+		<div class="page-content">
+			<h2>{{ event.event }}</h2>
+			<hr>
+			{% if participants %}
+					<!-- Tabs Nav -->
+					<ul class="nav" id="participantTabs" role="tablist">
+							{% for p in participants %}
+									<li class="nav-item" role="presentation">
+											<button class=" nav-link {% if active_tab == 'tab-'|add:p.id|stringformat:'s' %} active {% elif forloop.first and not active_tab %} active {% endif %}"
+															id="tab-{{ p.id }}"
+															data-bs-toggle="tab"
+															data-bs-target="#content-{{ p.id }}"
+															type="button"
+															role="tab"
+															href="#content-{{ p.id }}">{{ p.recipient.name }}</button>
+									</li>
+							{% endfor %}
+							<li class="nav-item">
+									<button class="nav-link add"
+													data-bs-toggle="modal"
+													data-bs-target="#addModal"
+													onclick="openModal('Add Participant', `{% url 'add_participant' event.id %}`)">New +</button>
+							</li>
+							<li class="hanging"></li>
+					</ul>
+					<!-- Tab Content -->
+					<div class="tab-content mt-3">
+							{% for p in participants %}
+									<div class="tab-pane fade {% if active_tab == 'tab-'|add:p.id|stringformat:'s' %} show active {% elif forloop.first and not active_tab %} show active {% endif %}"
+											id="content-{{ p.id }}"
+											role="tabpanel">
+											<div class="d-flex justify-content-between align-items-center mb-3">
+													<h5 class="mb-0">
+															{% if p.budget %}Budget: ${{ p.budget.price|floatformat:2 }}{% endif %}
+													</h5>
+													<h5 class="mb-0">
+															Total Spent: ${{ p.spent|floatformat:2 }}
+															{% if p.budget %}
+															</h5>
+															<h5 class="mb-0">
+																	Money Left:
+																	{% if p.remaining >= 0 %}
+																			${{ p.remaining|floatformat:2 }}
+																	{% else %}
+																			-${{ p.remaining|floatformat:2|cut:"-" }}
+																	{% endif %}
+															</h5>
+													{% endif %}
+													<button class="green-button"
+																	data-bs-toggle="modal"
+																	data-bs-target="#addModal"
+																	onclick="giftModal('Add Gift for {{ p.recipient.name|escapejs }}', `{% url 'add_gift' p.id %}`)">
+															Add New Gift +
+													</button>
+													<button class="green-button"
+																	data-bs-toggle="offcanvas"
+																	data-bs-target="#wishlistOffcanvas{{ p.id }}"
+																	aria-controls="wishlistOffcanvas">Add From Wish List +</button>
+											</div>
+											{% if p.gift_set.all %}
+													<ul class="gift-list">
+															{% for gift in p.gift_set.all %}
+																	<li class="gift">
+																			<!-- Dropdown for Edit/Delete -->
+																			<div class="dropdown">
+																					<button class="btn dropdown-toggle dots"
+																									type="button"
+																									data-bs-toggle="dropdown">...</button>
+																					<ul class="dropdown-menu">
+																							<li>
+																									<button class="dropdown-item"
+																													data-bs-toggle="modal"
+																													data-bs-target="#addModal"
+																													onclick="editGiftModal('Edit Gift', `{% url 'edit_gift' gift.id %}`)">
+																											Edit
+																									</button>
+																							</li>
+																							<li>
+																									<button class="dropdown-item"
+																													data-bs-toggle="modal"
+																													data-bs-target="#deleteModal"
+																													onclick="openDeleteModal(`{% url 'delete_gift' gift.id %}`, 'gift')">
+																											Delete
+																									</button>
+																							</li>
+																					</ul>
+																			</div>
+																			<div class="gift-box">
+																					{% if gift.product_image %}
+																							<div>
+																									<img src="{{ gift.product_image }}" alt="{{ gift.product_name }}">
+																							{% endif %}
+																					</div>
+																					<div id="gift-info">
+																							{% if gift.product_name %}
+																									<div>
+																											<a href="{{ gift.item_url }}"
+																												class="fw-semibold text-decoration-none"
+																												target="_blank">{{ gift.product_name }}</a>
+																									</div>
+																							{% else %}
+																									<div>
+																											<a href="{{ gift.item_url }}"
+																												class="fw-semibold text-decoration-none"
+																												target="_blank">{{ gift.item_url }}</a>
+																									</div>
+																							{% endif %}
+																							{% if gift.product_price %}
+																									<div>
+																											<a>${{ gift.product_price }}</a>
+																									</div>
+																							{% endif %}
+																					</div>
+																					<input type="checkbox"
+																								class="form-check-input delete-checkbox d-none"
+																								value="{{ gift.id }}">
+																			</div>
+																	</li>
+															{% endfor %}
+													</ul>
+											{% else %}
+													<p class="empty fst-italic">No gifts added yet.</p>
+											{% endif %}
+									</div>
+							{% endfor %}
+					</div>
+			{% else %}
+					<p>No participants yet.</p>
+			{% endif %}
+		</div>
 	</div>
 {% endblock %}

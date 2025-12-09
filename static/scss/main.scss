@@ -55,7 +55,11 @@ $green2: #36A379;
 @mixin gt($width) { @media (min-width: $width) { @content; } }
 @mixin between($width1, $width2) { @media (min-width: $width1) and (max-width: $width2) { @content; } }
 
-h1, h2, h3, h4, h5, p, a, button{
+h1, h2, h3, h4, h5, a, button{
+    color: $w;
+    text-align: center;
+}
+p, li {
     color: $w;
 }
 .w2 {
@@ -129,7 +133,6 @@ main{
 .page-content{
     max-width: 1400px;
     margin: auto;
-    padding: 50px 0;
 }
 
 .dropdown-toggle::after {
@@ -259,6 +262,7 @@ h3 {
                     display: flex;
                     justify-content: center;
                     .button{
+                        margin-top: 60px;
                         width: 238px;
                         @include lg { // 960px
                             width: 400px;
@@ -293,26 +297,21 @@ h3 {
     align-items: center;
     gap: 8px;
     text-align: center;
-    .participant{
-        width: 105px;
-        height: 84px;
-        padding: 0 2px 12.2px 2px;
-        margin-top: 10px;
-        @include sm { // 576px
-            width: 130px;
-            height: 88.2px;
-        }
+    .add {
+        width: 84px;
         @include md { // 768px
-            width: 135px;
+            width: 99px;
+        }
+    }
+    .participant{
+        height: 84px;
+        padding: 5px 10px;
+        margin-top: 10px;
+        @include md { // 768px
             height: 99px;
-            padding: 0 2px 18.8px 2px;
         }
         h4{
             font-size: 14px;
-            margin-top: -10px;
-            @include sm { // 576px
-                font-size: 15px;
-            }
             @include md { // 768px
                 font-size: 16px;
             }
@@ -320,9 +319,6 @@ h3 {
         p{
             font-size: 11px;
             margin: 0 8px 0 8px;
-            @include sm { // 576px
-                font-size: 12px;
-            }
             @include md { // 768px
                 font-size: 13px;
             }
@@ -449,34 +445,207 @@ h5{
     text-align: center;
 }
 
-[data-event-name-card*='poop'] {
-    background: #39210f !important;
+.decorations {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    
+    .bottom-left-decoration, .bottom-right-decoration {
+        position: relative;
+        bottom: 80px;
+        width: 100px;
+        height: 100px;
+        }
+    .bottom-left-decoration {
+        left: 5%;
+        background-size: 100px;
+    }
+    
+    .bottom-right-decoration {
+        right: 5%;
+        background-size: 100px;
+    }
+}
+.event-title-wrapper {
+    width: 100%;
+    height: 100px;
+    padding-top: 10px;
+    .title-decoration {
+        background-size: contain;
+        background-repeat: repeat-x;
+        background-position: center;
+        height: 50px;
+
+    }   
+}
+
+
+//christmas
+[data-event-name-card*='christmas'] {
     .decorations {
-        position: absolute;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
     
         .bottom-left-decoration {
-            position: relative;
-            bottom: 80px;
-            left: 1%;
-            width: 100px;
-            height: 100px;
-            background: red;
+            background-image: url('../img/christmas-1.png');
         }
     
         .bottom-right-decoration {
-            position: relative;
-            bottom: 80px;
-            right: 1%;
-            width: 100px;
-            height: 100px;
-            background: green;
+            background-image: url('../img/christmas-2.png');
+        }
+    }
+}
+[data-event-name-page*='christmas'] {
+    .title-decoration{
+        background-image: url('../img/christmas-3.png');
+    }
+}
+
+//birthday
+[data-event-name-card*='birthday'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/birthday-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/birthday-2.png');
+        }
+    }
+}
+[data-event-name-page*='birthday'] {
+    .title-decoration{
+        background-image: url('../img/birthday-3.png');
+    }
+}
+
+
+//hanukkah
+[data-event-name-card*='hanukkah'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/hanukkah-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/hanukkah-2.png');
         }
     }
 }
 
-[data-event-name-page*='poop'] {
-    background: linear-gradient(#563114, #291607) !important;
+//easter
+[data-event-name-card*='easter'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/easter-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/easter-2.png');
+        }
+    }
+}
+[data-event-name-page*='easter'] {
+    .title-decoration{
+        background-image: url('../img/easter-3.png');
+    }
+}
+
+//valentine
+[data-event-name-card*='valentine'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/valentine-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/valentine-2.png');
+        }
+    }
+}
+[data-event-name-page*='valentine'] {
+    .title-decoration{
+        background-image: url('../img/valentine-3.png');
+    }
+}
+
+//graduation
+[data-event-name-card*='graduation'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/graduation-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/graduation-2.png');
+        }
+    }
+}
+
+
+//anniversary
+[data-event-name-card*='anniversary'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/anniversary-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/anniversary-2.png');
+        }
+    }
+}
+
+
+//halloween
+[data-event-name-card*='halloween'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/halloween-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/halloween-2.png');
+        }
+    }
+}
+[data-event-name-page*='halloween'] {
+    .title-decoration{
+        background-image: url('../img/halloween-2.png');
+    }
+}
+
+//baby
+[data-event-name-card*='baby'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/baby-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/baby-2.png');
+        }
+    }
+}
+
+
+//wedding
+[data-event-name-card*='wedding'] {
+    .decorations {
+    
+        .bottom-left-decoration {
+            background-image: url('../img/wedding-1.png');
+        }
+    
+        .bottom-right-decoration {
+            background-image: url('../img/wedding-2.png');
+        }
+    }
 }
