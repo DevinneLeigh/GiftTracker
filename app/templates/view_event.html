@@ -36,34 +36,48 @@
 									<div class="tab-pane fade {% if active_tab == 'tab-'|add:p.id|stringformat:'s' %} show active {% elif forloop.first and not active_tab %} show active {% endif %}"
 											id="content-{{ p.id }}"
 											role="tabpanel">
-											<div class="d-flex justify-content-between align-items-center mb-3">
+											<div class="d-flex  g-2 mb-3 flex-lg-row flex-column">
+												<div class ="p-2 mt-3">
 													<h5 class="mb-0">
-															{% if p.budget %}Budget: ${{ p.budget.price|floatformat:2 }}{% endif %}
+															{% if p.budget %}<span style="color:#49c696;">Budget:</span> ${{ p.budget.price|floatformat:2 }}{% endif %}
 													</h5>
+												</div>
+												<div class ="p-2 mt-3">
 													<h5 class="mb-0">
-															Total Spent: ${{ p.spent|floatformat:2 }}
+															<span style="color:#49c696;">Total Spent:</span> ${{ p.spent|floatformat:2 }}
 															{% if p.budget %}
-															</h5>
+													</h5>
+												</div>
+												<div class="p-2 mt-3">
+
 															<h5 class="mb-0">
-																	Money Left:
+																	<span style="color:#49c696;">Money Left:</span>
 																	{% if p.remaining >= 0 %}
 																			${{ p.remaining|floatformat:2 }}
 																	{% else %}
 																			-${{ p.remaining|floatformat:2|cut:"-" }}
 																	{% endif %}
 															</h5>
+												</div>
 													{% endif %}
+													
+												<div class="m-auto ms-lg-auto me-lg-0 p-2">
 													<button class="green-button"
-																	data-bs-toggle="modal"
-																	data-bs-target="#addModal"
-																	onclick="giftModal('Add Gift for {{ p.recipient.name|escapejs }}', `{% url 'add_gift' p.id %}`)">
+															data-bs-toggle="modal"
+															data-bs-target="#addModal"
+															onclick="giftModal('Add Gift for {{ p.recipient.name|escapejs }}', `{% url 'add_gift' p.id %}`)">
 															Add New Gift +
 													</button>
+												</div>
+												<div class="p-2 m-auto m-lg-1">
 													<button class="green-button"
-																	data-bs-toggle="offcanvas"
-																	data-bs-target="#wishlistOffcanvas{{ p.id }}"
-																	aria-controls="wishlistOffcanvas">Add From Wish List +</button>
+															data-bs-toggle="offcanvas"
+															data-bs-target="#wishlistOffcanvas{{ p.id }}"
+															aria-controls="wishlistOffcanvas">Add From Wish List +
+													</button>
+												</div>
 											</div>
+										</div>
 											{% if p.gift_set.all %}
 													<ul class="gift-list">
 															{% for gift in p.gift_set.all %}
